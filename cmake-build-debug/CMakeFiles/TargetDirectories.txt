@@ -1,0 +1,3 @@
+/Users/artemakulov/Study/2 course/1 sem/CW/Project/cmake-build-debug/CMakeFiles/Project.dir
+/Users/artemakulov/Study/2 course/1 sem/CW/Project/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/artemakulov/Study/2 course/1 sem/CW/Project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
