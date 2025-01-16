@@ -3,12 +3,13 @@
 
 #include "vector.h"
 
-enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER};
+enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, OPERATOR};
 
 typedef struct Tok{
     enum TokenType type;
     Vector * vec;
     struct Tok* next;
+    int order;
 } Token;
 
 Token* initToken() {
