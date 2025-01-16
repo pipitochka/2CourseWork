@@ -3,4 +3,4 @@ project(Project C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(Project Token.c)
+add_executable(Project token.c)
