@@ -9,7 +9,7 @@ add_executable(Project
 
 add_executable(
         lexer_tests
-        Lexer/tests/lexerTests.c
+        Sourse/Lexer/tests/lexerTests.c
 )
 
 set_target_properties(lexer_tests PROPERTIES

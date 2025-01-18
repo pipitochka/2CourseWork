@@ -1,4 +1,4 @@
-#include "Lexer/lexer.c"
+#include "Sourse/Lexer/lexer.c"
 
 
 int main() {
