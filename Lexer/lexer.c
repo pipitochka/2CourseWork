@@ -5,13 +5,16 @@ enum States {NONE_STATE, WORD_STATE, NUMBER_STATE, STRING_STATE, CHAR_STATE, SCO
     DELIMITER_STATE, OPERATOR_STATE, END_STATE, INCLUDE_STATE};
 
 
-int main() {
+Token* lexer(char* name) {
     FILE* file;
 
     Token* token = initToken(); ;
     Token* first = token;
     token->next = NULL;
-    file = fopen("../test.txt", "r");
+    file = fopen(name, "r");
+    if (file == NULL) {
+        printf("File not found\n");
+    }
 
     enum States state = NONE_STATE;
 
@@ -59,7 +62,7 @@ int main() {
                     state = END_STATE;
                     break;
                 }
-                printf("%c", c);
+                printf("Error in symbol %c", c);
                 exit(1);
             case (NUMBER_STATE):
                 if (c >= '0' && c <= '9') {
@@ -75,6 +78,9 @@ int main() {
                     if (!feof(file)) {
                         break;
                     }
+                    else {
+                        state = END_STATE;
+                    }
                 }
             case (WORD_STATE):
                 if (c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
@@ -89,6 +95,9 @@ int main() {
                     state = NONE_STATE;
                     if (!feof(file)) {
                         break;
+                    }
+                    else {
+                        state = END_STATE;
                     }
                 }
             case (STRING_STATE):
@@ -110,6 +119,9 @@ int main() {
                     if (!feof(file)) {
                         c = fgetc(file);
                         break;
+                    }
+                    else {
+                        state = END_STATE;
                     }
                 }
             case (CHAR_STATE):
@@ -134,7 +146,12 @@ int main() {
                         exit(1);
                     }
                     state = NONE_STATE;
-                    if (!feof(file)) {c = fgetc(file);}
+                    if (!feof(file)) {
+                        c = fgetc(file);
+                    }
+                    else {
+                        state = END_STATE;
+                    }
                     break;
                 }
             case (SCOPE_STATE):
@@ -654,8 +671,5 @@ int main() {
                 exit(2);
         }
     }
-
-    printToken(first);
-
-    freeToken(first);
+    return first;
 }

@@ -24,7 +24,7 @@ Token* initToken() {
     return new;
 }
 
-void printToken(const Token* token) {
+void printTokens(const Token* token) {
     while (token != NULL) {
         printf("%s", token->vec->data);
         printf("\n");
@@ -32,9 +32,9 @@ void printToken(const Token* token) {
     }
 }
 
-void freeToken(Token* token) {
+void freeTokens(Token* token) {
     if (token && token->next != NULL) {
-        freeToken(token->next);
+        freeTokens(token->next);
     }
     if (token && token->vec != NULL) {
         freeVector(token->vec);
