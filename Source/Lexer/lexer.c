@@ -1,9 +1,8 @@
 #include <string.h>
-#include "token.h"
-
-enum States {NONE_STATE, WORD_STATE, NUMBER_STATE, STRING_STATE, CHAR_STATE, SCOPE_STATE,
-    DELIMITER_STATE, OPERATOR_STATE, END_STATE, INCLUDE_STATE};
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "lexer.h"
 
 Token* lexer(char* name) {
     FILE* file;
@@ -515,7 +514,7 @@ Token* lexer(char* name) {
                                     }
                                 }
                                 else {
-                                    pushBackVector(token->vec, '>');
+                                    pushBackVector(token->vec, '&');
                                     token->order = 11;
                                 }
                                 state = NONE_STATE;
@@ -654,7 +653,7 @@ Token* lexer(char* name) {
                     newToken = initToken();
                     token->next = newToken;
                     token = newToken;
-                    while(c != ' ' && !feof(file)) {
+                    while(c != ' ' && !feof(file) && c != '\n') {
                         pushBackVector(token->vec, c);
                         c = fgetc(file);
                     }

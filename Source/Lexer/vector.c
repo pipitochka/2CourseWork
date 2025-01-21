@@ -1,15 +1,7 @@
-#ifndef VECTOR_H
-#define VECTOR_H
 #include <stdlib.h>
 #include <stdio.h>
-
-
-//description of vector
-typedef struct Vec {
-    char* data;
-    int size;
-    int capacity;
-} Vector;
+#include <string.h>
+#include "vector.h"
 
 //allocate memory for vector
 Vector* initVector() {
@@ -55,4 +47,3 @@ void pushBackVector(Vector* vec, const char q) {
 }
 
 
-#endif //VECTOR_H

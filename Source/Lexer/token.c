@@ -1,16 +1,7 @@
-#ifndef TOKEN_H
-#define TOKEN_H
-
-#include "vector.h"
-
-enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, OPERATOR};
-
-typedef struct Tok{
-    enum TokenType type;
-    Vector * vec;
-    struct Tok* next;
-    int order;
-} Token;
+#include "token.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 Token* initToken() {
     Token* new = (Token*)malloc(sizeof(Token));
@@ -42,4 +33,4 @@ void freeTokens(Token* token) {
     free(token);
 }
 
-#endif //TOKEN_H
+
