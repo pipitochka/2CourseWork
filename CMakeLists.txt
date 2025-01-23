@@ -1,17 +1,24 @@
 cmake_minimum_required(VERSION 3.10)
 project(Project C)
-
 set(CMAKE_C_STANDARD 11)
 
 file(GLOB LEXER_SOURCES Source/Lexer/*.c)
-add_library(Lexer ${LEXER_SOURCES})
+file(GLOB ERROR_SOURCES Source/Error/*.c)
 
-add_executable(ccvc main.c)
+add_library(Lexer ${LEXER_SOURCES})
+add_library(Error ${ERROR_SOURCES})
+
+add_executable(
+        ccvc
+        main.c
+)
+
 add_executable(
         lexer_tests
         Source/Lexer/tests/lexerTests.c
 )
 
+target_link_libraries(Lexer Error)
 target_link_libraries(lexer_tests Lexer)
 target_link_libraries(ccvc Lexer)
 

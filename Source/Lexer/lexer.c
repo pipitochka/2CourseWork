@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "lexer.h"
+#include "tokenError.h"
 
 Token* lexer(char* name) {
     FILE* file;
@@ -111,8 +112,7 @@ Token* lexer(char* name) {
                         c = getc(file);
                     }
                     if (c != '\"') {
-                        printf("error: unterminated string\n");
-                        exit(1);
+                        tokenError(first, 1);
                     }
                     state = NONE_STATE;
                     if (!feof(file)) {
