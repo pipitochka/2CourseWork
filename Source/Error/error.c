@@ -11,6 +11,7 @@ char* errors[] = {
     "Invalid operator\n",
     "Invalid character\n",
     "Assert fault\n", //5
+    "File not found\n" //6
 };
 
 

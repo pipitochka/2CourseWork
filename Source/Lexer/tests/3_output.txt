@@ -35,7 +35,7 @@ n
 }
 int
 main
-(    
+(
 )
 {
 int
@@ -57,9 +57,9 @@ num
 printf
 (
 Факториал %d = %d\n
-, 
+,
 num
-, 
+,
 factorial
 (
 num

@@ -5,8 +5,11 @@
 #include <stdio.h>
 
 
-int compareVectors(Vector *a, Vector *b, Token *token) {
+int compareVectors(const Vector *a, const Vector *b, Token *token) {
     int t = 0;
+    if (safeAssert((a == NULL || b == NULL) || (a->size == b->size), token) == 0) {
+        return 0;
+    }
     while (t < a->size && t < b->size) {
         if (safeAssert(a->data[t] == b->data[t], token) == 0) {
             return 0;
@@ -47,6 +50,7 @@ int lexerTest(char* name, char* input, char* expected) {
         c = fgetc(file);
     }
     printf("%s tests passed\n", name);
+    return 1;
 }
 
 

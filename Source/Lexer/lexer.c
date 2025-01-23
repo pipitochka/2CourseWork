@@ -4,6 +4,7 @@
 #include <string.h>
 #include "lexer.h"
 #include "tokenError.h"
+#include "../Error/error.h"
 
 Token* lexer(char* name) {
     FILE* file;
@@ -13,7 +14,8 @@ Token* lexer(char* name) {
     token->next = NULL;
     file = fopen(name, "r");
     if (file == NULL) {
-        printf("File not found\n");
+        printErrorMessage(6);
+        return NULL;
     }
 
     enum States state = NONE_STATE;
@@ -73,7 +75,6 @@ Token* lexer(char* name) {
                         pushBackVector(token->vec, c);
                         c = getc(file);
                     }
-                    pushBackVector(token->vec, '\0');
                     state = NONE_STATE;
                     if (!feof(file)) {
                         break;
@@ -91,7 +92,6 @@ Token* lexer(char* name) {
                         pushBackVector(token->vec, c);
                         c = getc(file);
                     }
-                    pushBackVector(token->vec, '\0');
                     state = NONE_STATE;
                     if (!feof(file)) {
                         break;
