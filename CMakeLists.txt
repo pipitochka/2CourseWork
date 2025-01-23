@@ -4,9 +4,11 @@ set(CMAKE_C_STANDARD 11)
 
 file(GLOB LEXER_SOURCES Source/Lexer/*.c)
 file(GLOB ERROR_SOURCES Source/Error/*.c)
+file(GLOB ASSERT_SOURCES Source/SafeAssert/*.c)
 
 add_library(Lexer ${LEXER_SOURCES})
 add_library(Error ${ERROR_SOURCES})
+add_library(Assert ${ASSERT_SOURCES})
 
 add_executable(
         ccvc
@@ -20,6 +22,7 @@ add_executable(
 
 target_link_libraries(Lexer Error)
 target_link_libraries(lexer_tests Lexer)
+target_link_libraries(lexer_tests Assert)
 target_link_libraries(ccvc Lexer)
 
 target_include_directories(ccvc PRIVATE Source/Lexer)

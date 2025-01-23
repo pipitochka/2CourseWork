@@ -62,8 +62,8 @@ Token* lexer(char* name) {
                     state = END_STATE;
                     break;
                 }
-                printf("Error in symbol %c", c);
-                exit(1);
+                tokenError(token, 2);
+                return NULL;
             case (NUMBER_STATE):
                 if (c >= '0' && c <= '9') {
                     Token* newToken = initToken();
@@ -113,6 +113,7 @@ Token* lexer(char* name) {
                     }
                     if (c != '\"') {
                         tokenError(first, 1);
+                        return NULL;
                     }
                     state = NONE_STATE;
                     if (!feof(file)) {
@@ -130,19 +131,19 @@ Token* lexer(char* name) {
                     token = newToken;
                     token->type = CHAR;
                     if (feof(file)) {
-                        printf("error: unterminated character\n");
-                        exit(1);
+                        tokenError(first, 1);
+                        return NULL;
                     }
                     c = fgetc(file);
                     pushBackVector(token->vec, c);
                     if (feof(file)) {
-                        printf("error: unterminated character\n");
-                        exit(1);
+                        tokenError(first, 1);
+                        return NULL;
                     }
                     c = fgetc(file);
                     if (c != '\'') {
-                        printf("error: unterminated character\n");
-                        exit(1);
+                        tokenError(first, 1);
+                        return NULL;
                     }
                     state = NONE_STATE;
                     if (!feof(file)) {
@@ -392,7 +393,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '<');
                                     pushBackVector(token->vec, '=');
                                     token->order = 9;
-                                    if (feof(file)) {
+                                    if (!feof(file)) {
                                         c = fgetc(file);
                                     }
                                     else {
@@ -634,8 +635,8 @@ Token* lexer(char* name) {
                             }
                             break;
                         default:
-                            printf("Invalid opertaor");
-                            exit(-2);
+                            tokenError(first, 3);
+                            return first;
                     }
                 }
             case (INCLUDE_STATE):
@@ -667,7 +668,8 @@ Token* lexer(char* name) {
                 if (feof(file)) {
                     break;
                 }
-                exit(2);
+                tokenError(first, 4);
+                return first;
         }
     }
     return first;

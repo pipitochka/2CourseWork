@@ -5,7 +5,12 @@
 #include "error.h"
 
 char* errors[] = {
-    "error: unterminated string\n",
+    "error: unterminated string\n", //0
+    "error: unterminated character\n",
+    "Error in symbol %c\n",
+    "Invalid operator\n",
+    "Invalid character\n",
+    "Assert fault\n", //5
 };
 
 

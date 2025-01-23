@@ -1,23 +1,30 @@
 #include "../lexer.h"
+#include "../SafeAssert/safeAssert.h"
 #include "assert.h"
 #include <stdlib.h>
 #include <stdio.h>
 
 
-void compareVectors(Vector *a, Vector *b) {
+int compareVectors(Vector *a, Vector *b, Token *token) {
     int t = 0;
     while (t < a->size && t < b->size) {
-        assert(a->data[t] == b->data[t]);
+        if (safeAssert(a->data[t] == b->data[t], token) == 0) {
+            return 0;
+        }
         t++;
     };
+    return 1;
 }
 
-void lexerTest(char* name, char* input, char* expected) {
+int lexerTest(char* name, char* input, char* expected) {
     Token* token = lexer(input);
     Token* first = token;
-
+    safeAssert(token != NULL, token);
+    if (token == NULL) {
+        return 0;
+    }
     token = token->next;
-    printTokens(token);
+    //printTokens(token);
     FILE* file = fopen(expected, "r");
 
     char c = fgetc(file);
@@ -29,9 +36,11 @@ void lexerTest(char* name, char* input, char* expected) {
             pushBackVector(result, c);
             c = fgetc(file);
         }
-        printf("%s\n", token->vec->data);
-        printf("%s\n", result->data);
-        compareVectors(token->vec, result);
+        //printf("%s\n", token->vec->data);
+        //printf("%s\n", result->data);
+        if (compareVectors(token->vec, result, first) == 0) {
+            return 0;
+        }
         freeVector(result);
 
         token = token->next;
@@ -48,9 +57,9 @@ int main() {
     // lexerTest("4 test", "../Lexer/tests/4_input.txt", "../Lexer/tests/4_output.txt");
     // lexerTest("5 test", "../Lexer/tests/5_input.txt", "../Lexer/tests/5_output.txt");
 
-    //lexerTest("1 test", "../../Source/Lexer/tests/1_input.txt", "../../Source/Lexer/tests/1_output.txt");
-    //lexerTest("2 test", "../../Source/Lexer/tests/2_input.txt", "../../Source/Lexer/tests/2_output.txt");
+    lexerTest("1 test", "../../Source/Lexer/tests/1_input.txt", "../../Source/Lexer/tests/1_output.txt");
+    lexerTest("2 test", "../../Source/Lexer/tests/2_input.txt", "../../Source/Lexer/tests/2_output.txt");
     lexerTest("3 test", "../../Source/Lexer/tests/3_input.txt", "../../Source/Lexer/tests/3_output.txt");
-
-
+    lexerTest("4 test", "../../Source/Lexer/tests/4_input.txt", "../../Source/Lexer/tests/4_output.txt");
+    lexerTest("5 test", "../../Source/Lexer/tests/5_input.txt", "../../Source/Lexer/tests/5_output.txt");
 }
