@@ -651,6 +651,7 @@ Token* lexer(char* name) {
                     while (c == ' ' && !feof(file)) {
                         c = fgetc(file);
                     }
+                    token->type = INCLUDE;
                     newToken = initToken();
                     token->next = newToken;
                     token = newToken;
@@ -672,5 +673,12 @@ Token* lexer(char* name) {
                 return first;
         }
     }
+
+    token = first;
+    while (token != NULL) {
+        checkKeyword(token);
+        token = token->next;
+    }
+    
     return first;
 }

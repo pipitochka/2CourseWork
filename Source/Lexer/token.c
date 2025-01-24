@@ -33,4 +33,32 @@ void freeTokens(Token* token) {
     free(token);
 }
 
+char* keywords[] = {
+    "for",
+    "while",
+    "int",
+    "char",
+    "main",
+    "true",
+    "false",
+    "if",
+    "else",
+    "void",
+    "return"
+};
+
+int checkKeyword(Token* token) {
+    if (token == NULL || token->type != NONE) {
+        return -1;
+    }
+    for (int i = 0; i < sizeof(keywords)/sizeof(keywords[0]); i++) {
+        if (strcmp(token->vec->data, keywords[i]) == 0) {
+            token->type = KWORD;
+            return 1;
+        }
+    }
+    token->type = NAME;
+    return 0;
+} 
+
 
