@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "vector.h"
+#include "../include/vector.h"
 
 //allocate memory for vector
 Vector* initVector() {
     Vector* vec = (Vector*)malloc(sizeof(Vector));
     if (vec == NULL) {
         printf("Error in allocation memory for Vector\n");
-        exit(-1);
+        return NULL;
     }
     vec->size = 0;
     vec->capacity = 1;

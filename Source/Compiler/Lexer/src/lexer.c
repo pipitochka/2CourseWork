@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "lexer.h"
-#include "tokenError.h"
-#include "../Error/error.h"
+#include "../include/lexer.h"
+#include "../../../All//Token/include/tokenError.h"
+#include "../../../Safe/Error/include/error.h"
 
 Token* lexer(char* name) {
     FILE* file;

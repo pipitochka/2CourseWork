@@ -1,7 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "vector.h"
+#include "../../Vector/include/vector.h"
 
 enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, OPERATOR, KWORD, INCLUDE, NAME};
 

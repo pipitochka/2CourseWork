@@ -1,5 +1,5 @@
-#include "../lexer.h"
-#include "../SafeAssert/safeAssert.h"
+#include "../include/lexer.h"
+#include "../../../Safe/SafeAssert/include/safeAssert.h"
 #include "assert.h"
 #include <stdlib.h>
 #include <stdio.h>

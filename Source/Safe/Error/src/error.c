@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "error.h"
+#include "../include/error.h"
 
 char* errors[] = {
     "error: unterminated string\n", //0
@@ -12,6 +12,8 @@ char* errors[] = {
     "Invalid character\n",
     "Assert fault\n", //5
     "File not found\n" //6
+    "Allocation memory for Node error\n" //7
+    "Null node error\n" //8
 };
 
 
