@@ -3,7 +3,10 @@
 
 #include "../../Vector/include/vector.h"
 
-enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, OPERATOR, KWORD, INCLUDE, NAME};
+enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, BIN_OPERATOR, UNAR_OPERATOR, KWORD, INCLUDE, NAME, NUMBER};
+
+//enum TokenType {NONE, , , SCOPE_OPEN, SCOPE_CLOSE, , , , , };
+
 
 typedef struct Tok{
     enum TokenType type;
@@ -16,7 +19,9 @@ Token* initToken();
 
 void printTokens(const Token* token);
 
-void freeTokens(Token* token);
+void deleteTokens(Token* token);
+
+void deleteToken(Token* token);
 
 int checkKeyword(Token* token);
 

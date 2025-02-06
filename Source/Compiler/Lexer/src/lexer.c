@@ -71,6 +71,7 @@ Token* lexer(char* name) {
                     Token* newToken = initToken();
                     token->next = newToken;
                     token = newToken;
+                    token->type = NUMBER;
                     while (!feof(file) && c >= '0' && c <= '9') {
                         pushBackVector(token->vec, c);
                         c = getc(file);
@@ -192,7 +193,6 @@ Token* lexer(char* name) {
                     Token* newToken = initToken();
                     token->next = newToken;
                     token = newToken;
-                    token->type = OPERATOR;
                     switch (c) {
                         case '+':
                             if (!feof(file)) {
@@ -201,6 +201,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '+');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -213,6 +214,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '+');
                                     pushBackVector(token->vec, '+');
                                     token->order = 3;
+                                    token->type = UNAR_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -224,6 +226,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '+');
                                     token->order = 6;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -231,6 +234,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '+');
                                 token->order = 6;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -241,6 +245,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '-');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -249,10 +254,11 @@ Token* lexer(char* name) {
                                         break;
                                     }
                                 }
-                                else if (c == '+') {
+                                else if (c == '-') {
                                     pushBackVector(token->vec, '-');
                                     pushBackVector(token->vec, '-');
                                     token->order = 3;
+                                    token->type = UNAR_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -264,6 +270,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '-');
                                     token->order = 6;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -271,6 +278,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '-');
                                 token->order = 6;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -281,6 +289,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '*');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -292,6 +301,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '*');
                                     token->order = 5;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -299,6 +309,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '*');
                                 token->order = 5;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -309,6 +320,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '/');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -320,6 +332,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '/');
                                     token->order = 5;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -327,6 +340,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '/');
                                 token->order = 5;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -337,6 +351,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '%');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -348,6 +363,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '%');
                                     token->order = 5;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -355,6 +371,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '%');
                                 token->order = 5;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -365,6 +382,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '=');
                                     pushBackVector(token->vec, '=');
                                     token->order = 10;
+                                    token->type = BIN_OPERATOR  ;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -376,6 +394,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -383,6 +402,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '=');
                                 token->order = 16;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -393,6 +413,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '<');
                                     pushBackVector(token->vec, '=');
                                     token->order = 9;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -405,11 +426,13 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '<');
                                     pushBackVector(token->vec, '<');
                                     token->order = 7;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                         if (c == '=') {
                                             pushBackVector(token->vec, '=');
                                             token->order = 16;
+                                            token->type = BIN_OPERATOR;
                                         }
                                         if (!feof(file)) {
                                             c = fgetc(file);
@@ -427,6 +450,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '<');
                                     token->order = 9;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -434,6 +458,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '<');
                                 token->order = 9;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -444,6 +469,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '>');
                                     pushBackVector(token->vec, '=');
                                     token->order = 9;
+                                    token->type = BIN_OPERATOR;
                                     if (feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -456,6 +482,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '>');
                                     pushBackVector(token->vec, '>');
                                     token->order = 7;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                         if (c == '=') {
@@ -477,6 +504,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '>');
                                     token->order = 9;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -484,6 +512,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '>');
                                 token->order = 9;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -494,6 +523,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '&');
                                     pushBackVector(token->vec, '&');
                                     token->order = 14;
+                                    token->type = BIN_OPERATOR;
                                     if (feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -506,6 +536,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '&');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -517,6 +548,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '&');
                                     token->order = 11;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -524,6 +556,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '&');
                                 token->order = 11;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -534,6 +567,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '|');
                                     pushBackVector(token->vec, '|');
                                     token->order = 15;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -546,6 +580,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '|');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -557,6 +592,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '>');
                                     token->order = 13;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -564,6 +600,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '|');
                                 token->order = 13;
+                                token->type = BIN_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -574,6 +611,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '!');
                                     pushBackVector(token->vec, '=');
                                     token->order = 10;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -585,6 +623,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '!');
                                     token->order = 3;
+                                    token->type = UNAR_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -592,12 +631,14 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '!');
                                 token->order = 3;
+                                token->type = UNAR_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
                         case '~':
                             pushBackVector(token->vec, '~');
                             token->order = 3;
+                            token->type = UNAR_OPERATOR;
                             if (!feof(file)) {
                                 c = fgetc(file);
                                 state = NONE_STATE;
@@ -613,6 +654,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '^');
                                     pushBackVector(token->vec, '=');
                                     token->order = 16;
+                                    token->type = BIN_OPERATOR;
                                     if (!feof(file)) {
                                         c = fgetc(file);
                                     }
@@ -624,6 +666,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '^');
                                     token->order = 12;
+                                    token->type = UNAR_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
@@ -631,6 +674,7 @@ Token* lexer(char* name) {
                             else {
                                 pushBackVector(token->vec, '^');
                                 token->order = 12;
+                                token->type = UNAR_OPERATOR;
                                 state = END_STATE;
                             }
                             break;
@@ -679,6 +723,8 @@ Token* lexer(char* name) {
         checkKeyword(token);
         token = token->next;
     }
-    
+    token = first;
+    first = first->next;
+    deleteToken(token);
     return first;
 }

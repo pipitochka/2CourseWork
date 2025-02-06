@@ -23,13 +23,17 @@ void printTokens(const Token* token) {
     }
 }
 
-void freeTokens(Token* token) {
+void deleteTokens(Token* token) {
     if (token && token->next != NULL) {
-        freeTokens(token->next);
+        deleteTokens(token->next);
     }
     if (token && token->vec != NULL) {
         freeVector(token->vec);
     }
+    free(token);
+}
+
+void deleteToken(Token* token) {
     free(token);
 }
 

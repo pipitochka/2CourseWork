@@ -3,7 +3,7 @@
 
 int safeAssert(const int condition, Token * token){
     if(!condition){
-        freeTokens(token);
+        deleteTokens(token);
         printErrorMessage(5);
         return 0;
     }
