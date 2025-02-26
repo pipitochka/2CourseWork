@@ -11,6 +11,7 @@ Node* createNode(){
     node->parent = NULL;
     node->left = NULL;
     node->right = NULL;
+    node->type = NULL_NODE;
     return node;
 };
 //

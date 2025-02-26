@@ -14,32 +14,39 @@ void printAST(const Node* node) {
     printAST(node->right);
 }
 
-Node* addIncludeToken(Node* root, Token** token) {
-    Node* newNode = createNode();
-    root->right = newNode;
-    newNode->token = *token;
-    *token = (*token)->next;
-    
-    Node* child =  createNode();
-    child->token = *token;
-    newNode->left = child;
-    *token = (*token)->next;
-
-    newNode = createNode();
-    root->next = newNode;
-    newNode->prev = root;
-    return newNode;
-}
+ Node* addIncludeToken(Node* root, Token** token) {}
+//     Node* newNode = createNode();
+//     root->right = newNode;
+//     newNode->token = *token;
+//     *token = (*token)->next;
+//     
+//     Node* child =  createNode();
+//     child->token = *token;
+//     newNode->left = child;
+//     *token = (*token)->next;
+//
+//     newNode = createNode();
+//     root->next = newNode;
+//     newNode->prev = root;
+//     return newNode;
+// }
 
 Node* addOrdinaryToken(Node* root, Token** token) {
     Node* newNode = createNode();
     newNode->token = *token;
     *token = (*token)->next;
 
+    if (root->type == DATA_NODE) {
+        root->next = newNode;
+        newNode->prev = root;
+        return newNode;
+    }
+    
     if (root->right == NULL) {
         root->right = newNode;
         newNode->parent = root;
     }
+    
     else {
         newNode->left = root->right;
         root->right->parent = newNode;
@@ -72,6 +79,11 @@ Node* addOperatorToken(Node* root, Token** token) {
     else {
         newNode->left = root;
         root->parent = newNode;
+        if (root->prev) {
+            newNode->prev = root->prev;
+            root->prev->next = newNode;
+        }
+        
         return newNode;
     }
     
@@ -79,32 +91,62 @@ Node* addOperatorToken(Node* root, Token** token) {
 
 Node* addKwordToken(Node* root, Token** token) {}
 
-Node* addDelimetrToken(Node* root, Token** token) {}
+Node* addDelimetrToken(Node* root, Token** token) {
+    switch ((*token)->vec->data[0]) {
+        case ';': {
+            (*token) = (*token)->next;
+            while (root->parent != NULL) {
+                root = root->parent;
+            }
+            root = root->prev;
+            Node* newNode = createNode();
+            newNode->type = DATA_NODE;
+            newNode->top = root;
+            root->bottom = newNode;
+            return newNode;
+        }
+    }
+    
+}
 
 Node* addScopeOpenToken(Node* root, Token** token) {
     Node* newNode = createNode();
-    root->right = newNode;
+    root->bottom = newNode;
+    newNode->top = root;
+    root = root->bottom;
 
     newNode = createNode();
+    root->next = newNode;
+    newNode->prev = root;
     newNode->token = *token;
     *token = (*token)->next;
-
-    root->right->next = newNode;
-    newNode->prev = root->right;
+    root = root->next;
+    newNode->type = DATA_NODE;
+    
+    newNode = createNode();
+    root->bottom = newNode;
+    newNode->top = root;
+    newNode->type = DATA_NODE;
     return newNode;
 }
 
 Node* addScopeCloseToken(Node* root, Token** token) {
-    Node* newNode = createNode();
-    newNode->token = *token;
+    Node* newRoot = createNode();
+    newRoot->token = *token;
     *token = (*token)->next;
-
-    root->right = newNode;
+    root->bottom = newRoot;
+    newRoot->top = root;
     
-    while (root->parent != NULL) {
-        root = root->parent;
+    while (root->top != NULL) {
+        root = root->top;
     }
-    return root->prev;
+    root = root->prev;
+    newRoot = createNode();
+    newRoot->top = root;
+    root->bottom = newRoot;
+    newRoot->type = DATA_NODE;
+    
+    return newRoot;
 }
 
 Node* addTokenToNode(Node* root, Token** token) {
@@ -145,8 +187,16 @@ Node* createAST(Token* token){
     while(token != NULL && node != NULL){
         node = addTokenToNode(node, tok);
     }
-    while (root->parent != NULL) {
-        root = root->parent;
+    while (root->parent != NULL || root->prev != NULL || root->top != NULL) {
+        if (root->parent != NULL) {
+            root = root->parent;
+        }
+        if (root->prev != NULL) {
+            root = root->prev;
+        }
+        if (root->top != NULL) {
+            root = root->top;
+        }
     }
     return root;
 };
