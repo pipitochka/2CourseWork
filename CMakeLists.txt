@@ -3,7 +3,7 @@ project(Project C)
 set(CMAKE_C_STANDARD 11)
 
 ##debug
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -g")
+##set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -g")
 
 
 file(GLOB VECTOR_RESOURSES Source/All/Vector/src/*.c)

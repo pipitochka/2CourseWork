@@ -4,7 +4,7 @@
 #include "../../Vector/include/vector.h"
 
 enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, BIN_OPERATOR,
-    UNAR_OPERATOR, KWORD, INCLUDE, NAME, NUMBER};
+    UNAR_OPERATOR, KWORD, INCLUDE, NAME, NUMBER, SCOPE};
 
 //enum TokenType {NONE, , , SCOPE_OPEN, SCOPE_CLOSE, , , , , };
 

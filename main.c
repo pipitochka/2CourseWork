@@ -9,11 +9,10 @@ int main() {
     Node* q = createAST(tokens);
     printAST(q);
     
-    Vector* code = generateCode(q);
-    freeVector(code);
+    generateCode(q, "../text.out");
     
     
-    //freeNode(q);
+    freeNode(q);
     printTokens(tokens);
     deleteTokens(tokens);
     

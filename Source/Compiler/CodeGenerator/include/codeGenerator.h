@@ -3,6 +3,6 @@
 #include "../../../All/Node/include/node.h"
 #include "../../../All/Vector/include/vector.h"
 
-Vector* generateCode(Node* code);
+void generateCode(Node* code, char* filename);
 
 #endif //CODEGENERATOR_H

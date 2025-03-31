@@ -36,22 +36,7 @@ void printAST(const Node* node) {
 }
 
 
- Node* addIncludeToken(Node* root, Token** token) {}
-//     Node* newNode = createNode();
-//     root->right = newNode;
-//     newNode->token = *token;
-//     *token = (*token)->next;
-//     
-//     Node* child =  createNode();
-//     child->token = *token;
-//     newNode->left = child;
-//     *token = (*token)->next;
-//
-//     newNode = createNode();
-//     root->next = newNode;
-//     newNode->prev = root;
-//     return newNode;
-// }
+Node* addIncludeToken(Node* root, Token** token) {}
 
 Node* addOrdinaryToken(Node* root, Token** token) {
     Node* newNode = createNode();
@@ -127,6 +112,27 @@ Node* addDelimetrToken(Node* root, Token** token) {
             root->bottom = newNode;
             return newNode;
         }
+        case '(': {
+            (*token) = (*token)->next;
+            Node* newNode = createNode();
+            newNode->type = SCOPE;
+            newNode->parent = root;
+            if (root->left == NULL) {
+                root->left = newNode;
+            }
+            else {
+                root->right = newNode;
+            }
+            return newNode;
+        }
+        case ')': {
+            while (root && root->parent != NULL && root->parent->type != SCOPE) {
+                root = root->parent;
+            }
+            root = root->parent ? root->parent : NULL;
+            return root;
+        }
+        
     }
     
 }
