@@ -20,9 +20,12 @@ Vector* initVector() {
     return vec;
 }
 
-//dealocate memory for vector
-void freeVector(const Vector* vec) {
-    free(vec->data);
+
+void freeVector(Vector* vec) {
+    if (vec != NULL) {
+        free(vec->data);  
+        free(vec);        
+    }
 }
 
 //add element in the end of vector

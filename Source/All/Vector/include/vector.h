@@ -12,7 +12,7 @@ typedef struct Vec {
 Vector* initVector();
 
 //dealocate memory for vector
-void freeVector(const Vector* vec);
+void freeVector(Vector* vec);
 
 //add element in the end of vector
 void pushBackVector(Vector* vec, const char q);

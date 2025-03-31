@@ -719,12 +719,19 @@ Token* lexer(char* name) {
     }
 
     token = first;
-    while (token != NULL) {
-        checkKeyword(token);
-        token = token->next;
-    }
-    token = first;
     first = first->next;
     deleteToken(token);
+    
+    token = first;
+    while (token != NULL) {
+        if (token->vec != NULL) {
+            pushBackVector(token->vec, '\0');
+        }
+        if (token->type == NONE) {
+            checkKeyword(token);
+        }
+        token = token->next;
+    }
+    
     return first;
 }

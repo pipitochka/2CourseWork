@@ -15,6 +15,7 @@ char* errors[] = {
     "Allocation memory for Node error\n" //7
     "Null node error\n" //8
     "Error threre is left list" //9
+    "Error threre is left list" //10
 };
 
 

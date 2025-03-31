@@ -3,16 +3,38 @@
 #include <stdio.h>
 
 void printAST(const Node* node) {
-    if (node == NULL) return;
-    if (node->token) {
-        printf("%s\n", node->token->vec->data);
+    if (node == NULL) {
+        printf("printAST: NULL node, return\n");
+        return;
+    }
+
+    if (node->token == NULL) {
+        printf("printAST: node->token is NULL\n");
+    } else if (node->token->vec == NULL) {
+        printf("printAST: node->token->vec is NULL\n");
+    } else {
+        printf("Token: %s\n", node->token->vec->data);
+    }
+
+    
+    if (node->left) {
+        printf("Going left...\n");
+        printAST(node->left);
+    }
+    if (node->right) {
+        printf("Going right...\n");
+        printAST(node->right);
     }
     if (node->next) {
+        printf("Going next...\n");
         printAST(node->next);
     }
-    printAST(node->left);
-    printAST(node->right);
+    if (node->bottom) {
+        printf("Going bottom...\n");
+        printAST(node->bottom);
+    }
 }
+
 
  Node* addIncludeToken(Node* root, Token** token) {}
 //     Node* newNode = createNode();
@@ -132,15 +154,23 @@ Node* addScopeOpenToken(Node* root, Token** token) {
 
 Node* addScopeCloseToken(Node* root, Token** token) {
     Node* newRoot = createNode();
+    if (newRoot == NULL) {
+        return NULL;
+    }
     newRoot->token = *token;
     *token = (*token)->next;
     root->bottom = newRoot;
     newRoot->top = root;
     
-    while (root->top != NULL) {
+    while (root != NULL && root->top != NULL) {
         root = root->top;
     }
-    root = root->prev;
+    if (root->prev != NULL) {
+        root = root->prev;
+    }
+    else {
+        printErrorMessage(10);
+    }
     newRoot = createNode();
     newRoot->top = root;
     root->bottom = newRoot;
@@ -187,15 +217,21 @@ Node* createAST(Token* token){
     while(token != NULL && node != NULL){
         node = addTokenToNode(node, tok);
     }
+    if (root == NULL) {
+        return NULL;
+    }
     while (root->parent != NULL || root->prev != NULL || root->top != NULL) {
         if (root->parent != NULL) {
             root = root->parent;
+            break;
         }
         if (root->prev != NULL) {
             root = root->prev;
+            break;
         }
         if (root->top != NULL) {
             root = root->top;
+            break;
         }
     }
     return root;

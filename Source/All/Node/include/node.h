@@ -20,6 +20,8 @@ typedef struct Node{
 
 Node* createNode();
 
+void freeNode(Node* node);
+
 // int addChild(Node* parent, Node* children);
 //
 // void deleteNode(Node* node);
