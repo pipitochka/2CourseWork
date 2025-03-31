@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(Project C)
 set(CMAKE_C_STANDARD 11)
 
+##debug
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -g")
+
 
 file(GLOB VECTOR_RESOURSES Source/All/Vector/src/*.c)
 file(GLOB TOKEN_RESOURSES Source/All/Token/src/*.c)
@@ -12,6 +15,8 @@ file(GLOB ASSERT_SOURCES Source/Safe/SafeAssert/src/*.c)
 
 file(GLOB LEXER_SOURCES Source/Compiler/Lexer/src/*.c)
 file(GLOB SYNTAXER_SOURCES Source/Compiler/Syntaxer/src/*.c)
+file(GLOB CODE_GENERATOR_SOURCES Source/Compiler/CodeGenerator/src/*.c)
+
 
 
 add_library(Vector ${VECTOR_RESOURSES})
@@ -21,6 +26,7 @@ add_library(Error ${ERROR_SOURCES})
 add_library(Assert ${ASSERT_SOURCES})
 add_library(Lexer ${LEXER_SOURCES})
 add_library(Syntaxer ${SYNTAXER_SOURCES})
+add_library(CodeGenerator ${CODE_GENERATOR_SOURCES})
 
 
 add_executable(
@@ -48,15 +54,21 @@ target_link_libraries(Syntaxer Token)
 target_link_libraries(Syntaxer Error)
 target_link_libraries(Syntaxer Node)
 
+target_link_libraries(CodeGenerator Token)
+target_link_libraries(CodeGenerator Error)
+target_link_libraries(CodeGenerator Node)
+
 target_link_libraries(lexer_tests Token)
 target_link_libraries(lexer_tests Lexer)
 target_link_libraries(lexer_tests Assert)
 
 target_link_libraries(ccvc Lexer)
 target_link_libraries(ccvc Syntaxer)
+target_link_libraries(ccvc CodeGenerator)
 
 target_include_directories(ccvc PRIVATE Source/Compiler/Lexer)
 target_include_directories(ccvc PRIVATE Source/Compiler/Syntaxer)
+target_include_directories(ccvc PRIVATE Source/Compiler/CodeGenerator)
 target_include_directories(lexer_tests PRIVATE Source/Compiler/Lexer)
 
 set_target_properties(lexer_tests PROPERTIES
