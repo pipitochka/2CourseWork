@@ -17,6 +17,7 @@ char* errors[] = {
     "Error threre is left list\n" //9
     "Error threre is left list\n" //10
     "Error no left operator for assignments\n" //11
+    "Error no file to write\n" //12
 };
 
 
