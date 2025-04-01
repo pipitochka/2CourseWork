@@ -14,8 +14,9 @@ char* errors[] = {
     "File not found\n" //6
     "Allocation memory for Node error\n" //7
     "Null node error\n" //8
-    "Error threre is left list" //9
-    "Error threre is left list" //10
+    "Error threre is left list\n" //9
+    "Error threre is left list\n" //10
+    "Error no left operator for assignments\n" //11
 };
 
 

@@ -77,12 +77,13 @@ Node* addOperatorToken(Node* root, Token** token) {
     
 
     if ((*token)->type == UNAR_OPERATOR) {
+        *token = (*token)->next;
         if (root->type == DATA_NODE) {
             root->next = newNode;
             newNode->prev = root;
             return newNode;
         }
-        *token = (*token)->next;
+        
         if (root->left == NULL) {
             root->left = newNode;
             newNode->parent = root;
