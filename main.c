@@ -1,6 +1,5 @@
 #include "Source/Compiler/Lexer/include/lexer.h"
 #include "Source/Compiler/Syntaxer/include/syntaxer.h"
-#include "Source/All/Node/include/node.h"
 #include "Source/Compiler/CodeGenerator/include/codeGenerator.h"
 
 

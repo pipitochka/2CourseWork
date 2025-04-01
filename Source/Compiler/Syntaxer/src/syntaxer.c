@@ -74,8 +74,28 @@ Node* addOperatorToken(Node* root, Token** token) {
         root = root->parent;
     }
     
-    *token = (*token)->next;
+    
 
+    if ((*token)->type == UNAR_OPERATOR) {
+        if (root->type == DATA_NODE) {
+            root->next = newNode;
+            newNode->prev = root;
+            return newNode;
+        }
+        *token = (*token)->next;
+        if (root->left == NULL) {
+            root->left = newNode;
+            newNode->parent = root;
+            return newNode;
+        }
+        else {
+            root->right = newNode;
+            newNode->parent = root;
+            return newNode;
+        }
+    }
+    
+    *token = (*token)->next;
     if (root->parent != NULL) {
         newNode->left = root;
         root->parent->right = newNode;

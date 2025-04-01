@@ -26,7 +26,7 @@ int lexerTest(char* name, char* input, char* expected) {
     if (token == NULL) {
         return 0;
     }
-    token = token->next;
+    
     //printTokens(token);
     FILE* file = fopen(expected, "r");
 
@@ -39,8 +39,9 @@ int lexerTest(char* name, char* input, char* expected) {
             pushBackVector(result, c);
             c = fgetc(file);
         }
-        //printf("%s\n", token->vec->data);
-        //printf("%s\n", result->data);
+        pushBackVector(result, '\0');
+        // printf("%s\n", token->vec->data);
+        // printf("%s\n", result->data);
         if (compareVectors(token->vec, result, first) == 0) {
             return 0;
         }
@@ -61,9 +62,9 @@ int main() {
     // lexerTest("4 test", "../Lexer/tests/4_input.txt", "../Lexer/tests/4_output.txt");
     // lexerTest("5 test", "../Lexer/tests/5_input.txt", "../Lexer/tests/5_output.txt");
 
-    lexerTest("1 test", "../../Source/Lexer/tests/1_input.txt", "../../Source/Lexer/tests/1_output.txt");
-    lexerTest("2 test", "../../Source/Lexer/tests/2_input.txt", "../../Source/Lexer/tests/2_output.txt");
-    lexerTest("3 test", "../../Source/Lexer/tests/3_input.txt", "../../Source/Lexer/tests/3_output.txt");
-    lexerTest("4 test", "../../Source/Lexer/tests/4_input.txt", "../../Source/Lexer/tests/4_output.txt");
-    lexerTest("5 test", "../../Source/Lexer/tests/5_input.txt", "../../Source/Lexer/tests/5_output.txt");
+    lexerTest("1 test", "../../Source/Compiler/Lexer/tests/1_input.txt", "../../Source/Compiler/Lexer/tests/1_output.txt");
+    lexerTest("2 test", "../../Source/Compiler/Lexer/tests/2_input.txt", "../../Source/Compiler/Lexer/tests/2_output.txt");
+    lexerTest("3 test", "../../Source/Compiler/Lexer/tests/3_input.txt", "../../Source/Compiler/Lexer/tests/3_output.txt");
+    lexerTest("4 test", "../../Source/Compiler/Lexer/tests/4_input.txt", "../../Source/Compiler/Lexer/tests/4_output.txt");
+    lexerTest("5 test", "../../Source/Compiler/Lexer/tests/5_input.txt", "../../Source/Compiler/Lexer/tests/5_output.txt");
 }

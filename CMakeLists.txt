@@ -40,6 +40,11 @@ add_executable(
         Source/Compiler/Lexer/tests/lexerTests.c
 )
 
+add_executable(
+        code_generator_tests
+        Source/Compiler/CodeGenerator/tests/codeGeneratorTests.c
+)
+
 
 target_link_libraries(Token Vector)
 
@@ -62,6 +67,10 @@ target_link_libraries(lexer_tests Token)
 target_link_libraries(lexer_tests Lexer)
 target_link_libraries(lexer_tests Assert)
 
+target_link_libraries(code_generator_tests Lexer)
+target_link_libraries(code_generator_tests Syntaxer)
+target_link_libraries(code_generator_tests CodeGenerator)
+
 target_link_libraries(ccvc Lexer)
 target_link_libraries(ccvc Syntaxer)
 target_link_libraries(ccvc CodeGenerator)
@@ -69,9 +78,18 @@ target_link_libraries(ccvc CodeGenerator)
 target_include_directories(ccvc PRIVATE Source/Compiler/Lexer)
 target_include_directories(ccvc PRIVATE Source/Compiler/Syntaxer)
 target_include_directories(ccvc PRIVATE Source/Compiler/CodeGenerator)
+
+target_include_directories(code_generator_tests PRIVATE Source/Compiler/Lexer)
+target_include_directories(code_generator_tests PRIVATE Source/Compiler/Syntaxer)
+target_include_directories(code_generator_tests PRIVATE Source/Compiler/CodeGenerator)
+
 target_include_directories(lexer_tests PRIVATE Source/Compiler/Lexer)
 
 set_target_properties(lexer_tests PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+)
+
+set_target_properties(code_generator_tests PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
 
