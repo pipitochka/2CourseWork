@@ -105,7 +105,9 @@ Node* addDelimetrToken(Node* root, Token** token) {
             while (root->parent != NULL) {
                 root = root->parent;
             }
-            root = root->prev;
+            if (root->prev) {
+                root = root->prev;
+            }
             Node* newNode = createNode();
             newNode->type = DATA_NODE;
             newNode->top = root;
@@ -212,6 +214,7 @@ Node* addTokenToNode(Node* root, Token** token) {
 
 Node* createAST(Token* token){
     Node* root = createNode();
+    root->type = DATA_NODE;
     if (root == NULL){
         deleteTokens(token);
         return NULL;

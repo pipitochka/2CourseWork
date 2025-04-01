@@ -523,7 +523,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '&');
                                     token->order = 14;
                                     token->type = BIN_OPERATOR;
-                                    if (feof(file)) {
+                                    if (!feof(file)) {
                                         c = fgetc(file);
                                     }
                                     else {
