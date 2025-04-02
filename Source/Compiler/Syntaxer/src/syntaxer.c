@@ -259,11 +259,10 @@ Node* addDelimetrToken(Node* root, Token** token) {
         case ')': {
             isLastOp = 0;
             (*token) = (*token)->next;
-            while (root && root->parent != NULL && root->parent->token->type != SCOPE
-                && strcmp(root->parent->token->vec->data, ")") == 0) {
+            while (root && root->parent != NULL && !(root->token->type == DELIMITER
+                && strcmp(root->token->vec->data, "(") == 0)) {
                 root = root->parent;
             }
-            root = root->parent ? root->parent : NULL;
             return root;
         }
         

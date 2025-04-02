@@ -90,7 +90,15 @@ int getValue(Token* token) {
     } else if (strcmp(token->vec->data, "^") == 0) {
         return 29;
     } else if (strcmp(token->vec->data, "^=") == 0) {
-        return 30; 
+        return 30;
+    } else if (strcmp(token->vec->data, "&") == 0 && token->type == BIN_OPERATOR) {
+        return 31;
+    } else if (strcmp(token->vec->data, "|") == 0) {
+        return 32;
+    } else if (strcmp(token->vec->data, "*") == 0 && token->type == UNAR_OPERATOR) {
+        return 33;
+    } else if (strcmp(token->vec->data, "&") == 0 && token->type == UNAR_OPERATOR) {
+        return 34;
     } else {
         return -1; 
     }
@@ -127,7 +135,7 @@ void generate(Node* node, FILE* file) {
                     break;
                 }
                 case 2: {
-                    fprintf(file, "div a0, a0, a2\n");
+                    fprintf(file, "sub a0, a0, a2\n");
                     break;
                 }
                 case 3: {
@@ -173,7 +181,7 @@ void generate(Node* node, FILE* file) {
                     break;
                 }
                 case 11: {
-                    fprintf(file, "sw a2, 0(a1)\n");
+                    fprintf(file, "sw a0, 0(a1)\n");
                     fprintf(file, "\n");
                     break;
                 }
@@ -409,6 +417,33 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "sw a0, 0(a1)\n");
                     break;
                 }
+                case 31: {
+                    fprintf(file, "and a0, a0, a2\n");
+                    break;
+                }
+                case 32: {
+                    fprintf(file, "or a0, a0, a2\n");
+                    break;
+                }
+                case 33: {
+                    if (node->right) {
+                        fprintf(file, "mv a1, a2\n");
+                        fprintf(file, "lw a0, 0(a1)\n");
+                    }
+                    else {
+                        fprintf(file, "mv a1, a0\n");
+                        fprintf(file, "lw a0, 0(a1)\n");
+                    }
+                }
+                case 34: {
+                    if (node->right) {
+                        fprintf(file, "mv a0, a3\n");
+                    }
+                    else {
+                        fprintf(file, "mv a0, a1\n");
+                    }
+                    break;
+                }
             }
             fprintf(file, "# end OP\n");
 
@@ -427,9 +462,6 @@ void generate(Node* node, FILE* file) {
             if (node->right) {
                 generate(node->right, file);
             }
-        }
-        else {
-            printErrorMessage(15);
         }
         //generate(node->right, file);
         generate(node->bottom, file);

@@ -589,7 +589,7 @@ Token* lexer(char* name) {
                                     }
                                 }
                                 else {
-                                    pushBackVector(token->vec, '>');
+                                    pushBackVector(token->vec, '|');
                                     token->order = 13;
                                     token->type = BIN_OPERATOR;
                                 }
@@ -665,7 +665,7 @@ Token* lexer(char* name) {
                                 else {
                                     pushBackVector(token->vec, '^');
                                     token->order = 12;
-                                    token->type = UNAR_OPERATOR;
+                                    token->type = BIN_OPERATOR;
                                 }
                                 state = NONE_STATE;
                                 break;
