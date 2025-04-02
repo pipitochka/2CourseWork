@@ -24,10 +24,4 @@ Node* createNode();
 
 void freeNode(Node* node);
 
-// int addChild(Node* parent, Node* children);
-//
-// void deleteNode(Node* node);
-//
-// void changeChild(Node* parent, Node* from, Node* to);
-
 #endif //NODE_H

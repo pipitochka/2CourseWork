@@ -4,10 +4,15 @@
 #include <string.h>
 
 
-const char* path = "variable.txt";
-FILE* file;
 
 int isLastOp = 1;
+
+Triple* triple;
+
+Triple* getTriple() {
+    return triple;
+}
+
 
 void printAST(const Node* node) {
     if (node == NULL) {
@@ -146,11 +151,12 @@ Node* addKwordToken(Node* root, Token** token) {
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
             if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    fprintf(file, "%s: .word 0\n", label->vec->data);
-                    label = label->next->next;
-                    if (strcmp(label->next->vec->data, ";") == 0) {
+                    addTriple(&triple, label->vec->data, 4, VAR, 1);
+                    if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
                         break;
                     }
+                    label = label->next->next;
+                    
                 }
                 //function
                 else if (label->next->vec->data == "(") {
@@ -159,12 +165,31 @@ Node* addKwordToken(Node* root, Token** token) {
                 
             }
             else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
-                fprintf(file, "%s: .word 0\n", label->vec->data);
-                while (label && label->type != DELIMITER) {
-                    label = label->next;
+                if (strcmp(label->next->vec->data, "[") == 0) {
+                    if (label->next->next && label->next->next->type == NUMBER
+                        && label->next->next->next && label->next->next->next->type == DELIMITER
+                        && strcmp(label->next->next->next->vec->data, "]") == 0
+                        && label->next->next->next->next && label->next->next->next->next->type == DELIMITER
+                        && (strcmp(label->next->next->next->next->vec->data, ",")
+                            || strcmp(label->next->next->next->next->vec->data, ";"))) {
+                        int counter = atoi(label->next->next->vec->data);
+                        addTriple(&triple, label->vec->data, 4, MAS, counter);
+                        label = label->next->next->next->next->next;
+                            
+                            }
+                    else {
+                        printErrorMessage(14);
+                        return NULL;
+                    }
                 }
-                if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
-                    label = label->next;
+                else {
+                    addTriple(&triple, label->vec->data, 4, VAR, 1);
+                    while (label && label->type != DELIMITER) {
+                        label = label->next;
+                    }
+                    if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
+                        label = label->next;
+                    }
                 }
             }
             else {
@@ -174,39 +199,7 @@ Node* addKwordToken(Node* root, Token** token) {
         (*token) = (*token)->next;
         return root;
     }
-    else if (strcmp((*token)->vec->data, "char") == 0) {
-        Token* label = (*token)->next;
-        while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
-            if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
-                if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    fprintf(file, "%s: .byte 0\n", label->vec->data);
-                    label = label->next->next;
-                    if (strcmp(label->next->vec->data, ";") == 0) {
-                        break;
-                    }
-                }
-                //function
-                else if (label->next->vec->data == "(") {
-                    
-                }
-                
-            }
-            else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
-                fprintf(file, "%s: .byte 0\n", label->vec->data);
-                while (label && label->type != DELIMITER) {
-                    label = label->next;
-                }
-                if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
-                    label = label->next;
-                }
-            }
-            else {
-                printErrorMessage(13);
-            }
-        }
-        (*token) = (*token)->next;
-        return root;
-    }
+    
 }
 
 Node* addDelimetrToken(Node* root, Token** token) {
@@ -265,7 +258,31 @@ Node* addDelimetrToken(Node* root, Token** token) {
             }
             return root;
         }
-        
+        // case '[': {
+        //     isLastOp = 1;
+        //     
+        //     Node* newNode = createNode();
+        //     newNode->type = NULL_NODE;
+        //     newNode->parent = root;
+        //     newNode->token = *token;
+        //     (*token) = (*token)->next;
+        //     if (root->right == NULL) {
+        //         root->right = newNode;
+        //     }
+        //     else {
+        //         root->left = newNode;
+        //     }
+        //     return newNode;
+        // }
+        case ']': {
+            isLastOp = 0;
+            (*token) = (*token)->next;
+            while (root && root->parent != NULL && !(root->token->type == BIN_OPERATOR
+                && strcmp(root->token->vec->data, "[") == 0)) {
+                root = root->parent;
+                }
+            return root;
+        }
     }
     
 }
@@ -344,7 +361,6 @@ Node* addTokenToNode(Node* root, Token** token) {
 };
 
 Node* createAST(Token* token){
-    file = fopen(path, "w");
     Node* root = createNode();
     root->type = DATA_NODE;
     if (root == NULL){
@@ -375,9 +391,6 @@ Node* createAST(Token* token){
             break;
         }
     }
-
-    fflush(file);
-    fclose(file);
     return root;
 };
 

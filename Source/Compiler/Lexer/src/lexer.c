@@ -5,6 +5,8 @@
 #include "../../../All//Token/include/tokenError.h"
 #include "../../../Safe/Error/include/error.h"
 
+
+
 Token* lexer(char* name) {
     FILE* file;
 
@@ -46,12 +48,12 @@ Token* lexer(char* name) {
                     state = SCOPE_STATE;
                     break;
                 }
-                if (c == ')' || c == '(' || c == ',' || c == ';' || c == ']' || c == '[' || c == ':') {
+                if (c == ')' || c == '(' || c == ',' || c == ';' || c == ']' || c == ':') {
                     state = DELIMITER_STATE;
                     break;
                 }
                 if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '=' || c == '<' || c == '>'
-                    || c == '&' || c == '|' || c == '!' || c == '~' || c == '^') {
+                    || c == '&' || c == '|' || c == '!' || c == '~' || c == '^' || c == '[') {
                     state = OPERATOR_STATE;
                     break;
                 }
@@ -174,7 +176,7 @@ Token* lexer(char* name) {
                     }
                 }
             case (DELIMITER_STATE):
-                if (c == ')' || c == '(' || c == ',' || c == ';' || c == '[' || c == ']' || c == ':') {
+                if (c == ')' || c == '(' || c == ',' || c == ';' || c == ']' || c == ':') {
                     Token* newToken = initToken();
                     token->next = newToken;
                     token = newToken;
@@ -188,11 +190,24 @@ Token* lexer(char* name) {
                 }
             case (OPERATOR_STATE):
                 if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '=' || c == '<' || c == '>'
-                    || c == '&' || c == '|' || c == '!' || c == '~' || c == '^') {
+                    || c == '&' || c == '|' || c == '!' || c == '~' || c == '^' || c == '[') {
                     Token* newToken = initToken();
                     token->next = newToken;
                     token = newToken;
                     switch (c) {
+                        case '[': {
+                            pushBackVector(token->vec, '[');
+                            token->order = 2;
+                            token->type = BIN_OPERATOR;
+                            if (!feof(file)) {
+                                c = fgetc(file);
+                                state = NONE_STATE;
+                            }
+                            else {
+                                state = END_STATE;
+                            }
+                            break;
+                        }
                         case '+':
                             if (!feof(file)) {
                                 c = fgetc(file);

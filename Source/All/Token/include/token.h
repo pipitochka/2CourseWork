@@ -9,10 +9,10 @@ enum TokenType {NONE, STRING, CHAR, SCOPE_OPEN, SCOPE_CLOSE, DELIMITER, BIN_OPER
 //enum TokenType {NONE, , , SCOPE_OPEN, SCOPE_CLOSE, , , , , };
 
 
-typedef struct Tok{
+typedef struct Token{
     enum TokenType type;
     Vector * vec;
-    struct Tok* next;
+    struct Token* next;
     int order;
 } Token;
 

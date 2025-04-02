@@ -8,7 +8,7 @@ int main() {
     Node* q = createAST(tokens);
     //printAST(q);
     
-    generateCode(q, "../text.out");
+    generateCode(q, "../text.out", getTriple());
     
     
     freeNode(q);
