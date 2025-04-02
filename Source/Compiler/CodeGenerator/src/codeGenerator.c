@@ -11,6 +11,17 @@ Triple* triple;
 void startOfFile(FILE* file) {
     fprintf(file, ".data\n");
 
+    Triple* data = triple;
+
+    while (data != NULL) {
+        if (data->type == VAR) {
+            fprintf(file, ".var %s\n", data->name);
+        }
+
+        
+        data = data->next;
+    }
+    
     fprintf(file, ".text\n");
     fprintf(file, ".global _start\n");
     fprintf(file, "\n");
@@ -99,10 +110,10 @@ int getValue(Token* token) {
 void generate(Node* node, FILE* file) {
     if (node != NULL) {
         if (!(node->next &&
-            (node->next->type == NUMBER
-                || node->next->type == STRING
-                || node->next->type == NAME
-                || (node->next->type == BIN_OPERATOR && strcmp(node->next->token->vec->data, "[") == 0)))) {
+            (node->next->token->type == NUMBER
+                || node->next->token->type == STRING
+                || node->next->token->type == NAME
+                || (node->next->token->type == BIN_OPERATOR && strcmp(node->next->token->vec->data, "[") == 0)))) {
             generate(node->next, file);
         }
         if (node->token && (node->token->type == BIN_OPERATOR || node->token->type == UNAR_OPERATOR)) {

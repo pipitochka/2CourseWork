@@ -252,13 +252,22 @@ Node* addKwordToken(Node* root, Token** token) {
         (*token) = (*token)->next;
         return root;
     }
+    else if (strcmp((*token)->vec->data, "if") == 0) {
+        Node* newNode = createNode();
+        newNode->parent = root;
+        newNode->token = (*token);
+        root->bottom = newNode;
+        *token = (*token)->next;
+        (*token)->vec->data[1] = ')';
+        pushBackVector((*token)->vec, '\0');
+        return newNode;
+    }
     
 }
 
 
 Node* addDelimetrToken(Node* root, Token** token) {
-    switch ((*token)->vec->data[0]) {
-        case ';': {
+    if (strcmp((*token)->vec->data, ";") == 0) {
             (*token) = (*token)->next;
             while (root->parent != NULL) {
                 root = root->parent;
@@ -273,7 +282,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             isLastOp = 1;
             return newNode;
         }
-        case ',': {
+    else if (strcmp((*token)->vec->data, ";") == 0) {
             (*token) = (*token)->next;
             while (root->parent != NULL) {
                 root = root->parent;
@@ -287,7 +296,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             root->bottom = newNode;
             return newNode;
         }
-        case '(': {
+    else if (strcmp((*token)->vec->data, "(") == 0) {
             isLastOp = 1;
             
             Node* newNode = createNode();
@@ -303,7 +312,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             }
             return newNode;
         }
-        case ')': {
+    else if (strcmp((*token)->vec->data, ")") == 0) {
             isLastOp = 0;
             (*token) = (*token)->next;
             while (root && root->parent != NULL && !(root->token->type == DELIMITER
@@ -312,23 +321,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             }
             return root;
         }
-        // case '[': {
-        //     isLastOp = 1;
-        //     
-        //     Node* newNode = createNode();
-        //     newNode->type = NULL_NODE;
-        //     newNode->parent = root;
-        //     newNode->token = *token;
-        //     (*token) = (*token)->next;
-        //     if (root->right == NULL) {
-        //         root->right = newNode;
-        //     }
-        //     else {
-        //         root->left = newNode;
-        //     }
-        //     return newNode;
-        // }
-        case ']': {
+    else if (strcmp((*token)->vec->data, "]") == 0) {
             isLastOp = 0;
             (*token) = (*token)->next;
             while (root && root->parent != NULL && !(root->token->type == BIN_OPERATOR
@@ -337,6 +330,13 @@ Node* addDelimetrToken(Node* root, Token** token) {
                 }
             return root;
         }
+    else if (strcmp((*token)->vec->data, "()") == 0) {
+        Node* newNode = createNode();
+        root->bottom = newNode;
+        newNode->top = root;
+        newNode->token = (*token);
+        (*token) = (*token)->next;
+        return newNode;
     }
     
 }
