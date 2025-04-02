@@ -1,6 +1,11 @@
 #include "../include/syntaxer.h"
 #include "../../../Safe/Error/include/error.h"
 #include <stdio.h>
+#include <string.h>
+
+
+const char* path = "variable.txt";
+FILE* file;
 
 void printAST(const Node* node) {
     if (node == NULL) {
@@ -34,7 +39,6 @@ void printAST(const Node* node) {
         printAST(node->bottom);
     }
 }
-
 
 Node* addIncludeToken(Node* root, Token** token) {}
 
@@ -117,11 +121,92 @@ Node* addOperatorToken(Node* root, Token** token) {
     
 }
 
-Node* addKwordToken(Node* root, Token** token) {}
+Node* addKwordToken(Node* root, Token** token) {
+    if (strcmp((*token)->vec->data, "int") == 0) {
+        Token* label = (*token)->next;
+        while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
+            if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
+                if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
+                    fprintf(file, "%s: .word 0\n", label->vec->data);
+                    label = label->next->next;
+                    if (strcmp(label->next->vec->data, ";") == 0) {
+                        break;
+                    }
+                }
+                //function
+                else if (label->next->vec->data == "(") {
+                    
+                }
+                
+            }
+            else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
+                fprintf(file, "%s: .word 0\n", label->vec->data);
+                while (label && label->type != DELIMITER) {
+                    label = label->next;
+                }
+                if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
+                    label = label->next;
+                }
+            }
+            else {
+                printErrorMessage(13);
+            }
+        }
+        (*token) = (*token)->next;
+        return root;
+    }
+    else if (strcmp((*token)->vec->data, "char") == 0) {
+        Token* label = (*token)->next;
+        while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
+            if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
+                if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
+                    fprintf(file, "%s: .byte 0\n", label->vec->data);
+                    label = label->next->next;
+                    if (strcmp(label->next->vec->data, ";") == 0) {
+                        break;
+                    }
+                }
+                //function
+                else if (label->next->vec->data == "(") {
+                    
+                }
+                
+            }
+            else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
+                fprintf(file, "%s: .byte 0\n", label->vec->data);
+                while (label && label->type != DELIMITER) {
+                    label = label->next;
+                }
+                if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
+                    label = label->next;
+                }
+            }
+            else {
+                printErrorMessage(13);
+            }
+        }
+        (*token) = (*token)->next;
+        return root;
+    }
+}
 
 Node* addDelimetrToken(Node* root, Token** token) {
     switch ((*token)->vec->data[0]) {
         case ';': {
+            (*token) = (*token)->next;
+            while (root->parent != NULL) {
+                root = root->parent;
+            }
+            if (root->prev) {
+                root = root->prev;
+            }
+            Node* newNode = createNode();
+            newNode->type = DATA_NODE;
+            newNode->top = root;
+            root->bottom = newNode;
+            return newNode;
+        }
+        case ',': {
             (*token) = (*token)->next;
             while (root->parent != NULL) {
                 root = root->parent;
@@ -234,6 +319,7 @@ Node* addTokenToNode(Node* root, Token** token) {
 };
 
 Node* createAST(Token* token){
+    file = fopen(path, "w");
     Node* root = createNode();
     root->type = DATA_NODE;
     if (root == NULL){
@@ -264,6 +350,9 @@ Node* createAST(Token* token){
             break;
         }
     }
+
+    fflush(file);
+    fclose(file);
     return root;
 };
 

@@ -6,13 +6,13 @@
 int main() {
     Token* tokens = lexer("../text.in");
     Node* q = createAST(tokens);
-    printAST(q);
+    //printAST(q);
     
     generateCode(q, "../text.out");
     
     
     freeNode(q);
-    printTokens(tokens);
+    //printTokens(tokens);
     deleteTokens(tokens);
     
     return 0;

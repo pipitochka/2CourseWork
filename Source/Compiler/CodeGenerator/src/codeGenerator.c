@@ -9,6 +9,18 @@ int counter = 0;
 void startOfFile(FILE* file) {
     fprintf(file, ".data\n");
 
+    FILE* fileVariable = fopen("variable.txt", "r");
+    if (fileVariable != NULL) {
+
+        char buffer[64];
+        
+        size_t bytesRead;
+        while (fgets(buffer, sizeof(buffer), fileVariable) != NULL) {
+            fprintf(file, "%s", buffer);
+        }
+    }
+
+    
     fprintf(file, ".text\n");
     fprintf(file, ".global _start\n");
 }

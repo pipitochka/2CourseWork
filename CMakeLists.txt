@@ -10,6 +10,7 @@ file(GLOB VECTOR_RESOURSES Source/All/Vector/src/*.c)
 file(GLOB TOKEN_RESOURSES Source/All/Token/src/*.c)
 file(GLOB NODE_RESOURSES Source/All/Node/src/*.c)
 
+
 file(GLOB ERROR_SOURCES Source/Safe/Error/src/*.c)
 file(GLOB ASSERT_SOURCES Source/Safe/SafeAssert/src/*.c)
 
@@ -27,7 +28,6 @@ add_library(Assert ${ASSERT_SOURCES})
 add_library(Lexer ${LEXER_SOURCES})
 add_library(Syntaxer ${SYNTAXER_SOURCES})
 add_library(CodeGenerator ${CODE_GENERATOR_SOURCES})
-
 
 add_executable(
         ccvc
