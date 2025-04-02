@@ -23,9 +23,11 @@ void startOfFile(FILE* file) {
     
     fprintf(file, ".text\n");
     fprintf(file, ".global _start\n");
+    fprintf(file, "\n");
 }
 
 void endOfFile(FILE* file) {
+    fprintf(file, "\n");
     fprintf(file, "li a0, 10\n");
     fprintf(file, "ecall\n");
 }

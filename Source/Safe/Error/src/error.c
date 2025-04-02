@@ -19,6 +19,7 @@ char* errors[] = {
     "Error no left operator for assignments\n" //11
     "Error no file to write\n" //12
     "Invalid syntax\n" //13
+    "Two binary OP\n" //13
 };
 
 

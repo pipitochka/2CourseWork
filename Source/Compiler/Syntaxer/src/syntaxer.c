@@ -7,6 +7,8 @@
 const char* path = "variable.txt";
 FILE* file;
 
+int isLastOp = 1;
+
 void printAST(const Node* node) {
     if (node == NULL) {
         printf("printAST: NULL node, return\n");
@@ -43,6 +45,7 @@ void printAST(const Node* node) {
 Node* addIncludeToken(Node* root, Token** token) {}
 
 Node* addOrdinaryToken(Node* root, Token** token) {
+    isLastOp = 0;
     Node* newNode = createNode();
     newNode->token = *token;
     *token = (*token)->next;
@@ -71,10 +74,27 @@ Node* addOperatorToken(Node* root, Token** token) {
     Node* newNode = createNode();
     newNode->token = *token;
     
+    if (isLastOp && (*token)->type == BIN_OPERATOR) {
+        isLastOp = 1;
+        if (token && *token && (strcmp((*token)->vec->data, "*") || strcmp((*token)->vec->data, "&"))) {
+            newNode->token->type = UNAR_OPERATOR;
+            newNode->token->order = 3;
+        }
+        else {
+            printErrorMessage(14);
+            return NULL;
+        }
+    }
+    else {
+        isLastOp = 1;
+    }
 
-    while (root->parent != NULL && root->parent->token != NULL
-        && (root->parent->token->type == BIN_OPERATOR || root->parent->token->type == UNAR_OPERATOR)
-        && (root->parent->token->order < (*token)->order)) {
+    
+    while (root->parent != NULL  &&
+        ((root->parent->token != NULL
+            && (root->parent->token->type == BIN_OPERATOR || root->parent->token->type == UNAR_OPERATOR)
+            && (root->parent->token->order < (*token)->order))
+            || (root->parent->type == SCOPE)))  {
         root = root->parent;
     }
     
@@ -118,7 +138,6 @@ Node* addOperatorToken(Node* root, Token** token) {
         
         return newNode;
     }
-    
 }
 
 Node* addKwordToken(Node* root, Token** token) {
@@ -204,6 +223,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             newNode->type = DATA_NODE;
             newNode->top = root;
             root->bottom = newNode;
+            isLastOp = 1;
             return newNode;
         }
         case ',': {
@@ -221,19 +241,22 @@ Node* addDelimetrToken(Node* root, Token** token) {
             return newNode;
         }
         case '(': {
+            isLastOp = 1;
             (*token) = (*token)->next;
             Node* newNode = createNode();
             newNode->type = SCOPE;
             newNode->parent = root;
-            if (root->left == NULL) {
-                root->left = newNode;
+            if (root->right == NULL) {
+                root->right = newNode;
             }
             else {
-                root->right = newNode;
+                root->left = newNode;
             }
             return newNode;
         }
         case ')': {
+            isLastOp = 0;
+            (*token) = (*token)->next;
             while (root && root->parent != NULL && root->parent->type != SCOPE) {
                 root = root->parent;
             }

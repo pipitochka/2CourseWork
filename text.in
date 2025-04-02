@@ -1,2 +1,1 @@
-int x, y, z = x + y, t = x++;
-char f, m, z = 5, tt = 12;
+++a;
