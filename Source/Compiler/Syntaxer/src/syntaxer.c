@@ -199,8 +199,62 @@ Node* addKwordToken(Node* root, Token** token) {
         (*token) = (*token)->next;
         return root;
     }
+    else if (strcmp((*token)->vec->data, "char") == 0) {
+        Token* label = (*token)->next;
+        while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
+            if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
+                if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
+                    addTriple(&triple, label->vec->data, 1, VAR, 1);
+                    if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
+                        break;
+                    }
+                    label = label->next->next;
+                    
+                }
+                //function
+                else if (label->next->vec->data == "(") {
+                    
+                }
+                
+            }
+            else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
+                if (strcmp(label->next->vec->data, "[") == 0) {
+                    if (label->next->next && label->next->next->type == NUMBER
+                        && label->next->next->next && label->next->next->next->type == DELIMITER
+                        && strcmp(label->next->next->next->vec->data, "]") == 0
+                        && label->next->next->next->next && label->next->next->next->next->type == DELIMITER
+                        && (strcmp(label->next->next->next->next->vec->data, ",")
+                            || strcmp(label->next->next->next->next->vec->data, ";"))) {
+                        int counter = atoi(label->next->next->vec->data);
+                        addTriple(&triple, label->vec->data, 1, MAS, counter);
+                        label = label->next->next->next->next->next;
+                            
+                            }
+                    else {
+                        printErrorMessage(14);
+                        return NULL;
+                    }
+                }
+                else {
+                    addTriple(&triple, label->vec->data, 1, VAR, 1);
+                    while (label && label->type != DELIMITER) {
+                        label = label->next;
+                    }
+                    if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
+                        label = label->next;
+                    }
+                }
+            }
+            else {
+                printErrorMessage(13);
+            }
+        }
+        (*token) = (*token)->next;
+        return root;
+    }
     
 }
+
 
 Node* addDelimetrToken(Node* root, Token** token) {
     switch ((*token)->vec->data[0]) {

@@ -483,7 +483,6 @@ void generate(Node* node, FILE* file) {
                 generate(node->right, file);
             }
         }
-        //generate(node->right, file);
         generate(node->bottom, file);
     }
 }
