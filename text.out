@@ -3,17 +3,37 @@
 .text
 .global _start
 
-la a0, a
-lw a0, 0(a0)
+# start OP
+la a1, b
+lw a0, 0(a1)
 addi sp, sp, -4
 sw a0, 0(sp)
+addi sp, sp, -4
+sw a1, 0(sp)
 
-lw a1, 0(sp)
+# start OP
+la a1, a
+lw a0, 0(a1)
+addi sp, sp, -4
+sw a0, 0(sp)
+addi sp, sp, -4
+sw a1, 0(sp)
+
+lw a3, 0(sp)
+addi sp, sp, 4
+lw a2, 0(sp)
 addi sp, sp, 4
 
-addi a1, a1, 1
-li a0, a
-sw a1, a0
+addi a2, a2, 1
+sw a2, 0(a3) 
+# end OP
+lw a3, 0(sp)
+addi sp, sp, 4
+lw a2, 0(sp)
+addi sp, sp, 4
+
+add a0, a0, a2
+# end OP
 
 li a0, 10
 ecall

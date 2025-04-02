@@ -242,10 +242,12 @@ Node* addDelimetrToken(Node* root, Token** token) {
         }
         case '(': {
             isLastOp = 1;
-            (*token) = (*token)->next;
+            
             Node* newNode = createNode();
-            newNode->type = SCOPE;
+            newNode->type = NULL_NODE;
             newNode->parent = root;
+            newNode->token = *token;
+            (*token) = (*token)->next;
             if (root->right == NULL) {
                 root->right = newNode;
             }
@@ -257,7 +259,8 @@ Node* addDelimetrToken(Node* root, Token** token) {
         case ')': {
             isLastOp = 0;
             (*token) = (*token)->next;
-            while (root && root->parent != NULL && root->parent->type != SCOPE) {
+            while (root && root->parent != NULL && root->parent->token->type != SCOPE
+                && strcmp(root->parent->token->vec->data, ")") == 0) {
                 root = root->parent;
             }
             root = root->parent ? root->parent : NULL;
