@@ -283,6 +283,17 @@ Node* addKwordToken(Node* root, Token** token) {
         pushBackVector((*token)->vec, '\0');
         return newNode;
     }
+    else if (strcmp((*token)->vec->data, "for") == 0) {
+        Node* newNode = createNode();
+        newNode->parent = root;
+        newNode->token = (*token);
+        root->bottom = newNode;
+        *token = (*token)->next;
+        (*token)->vec->data[1] = ')';
+        pushBackVector((*token)->vec, '\0');
+        return newNode;
+    }
+    
     
 }
 
@@ -336,9 +347,14 @@ Node* addDelimetrToken(Node* root, Token** token) {
     else if (strcmp((*token)->vec->data, ")") == 0) {
             isLastOp = 0;
             (*token) = (*token)->next;
-            while (root && root->parent != NULL && !(root->token->type == DELIMITER
-                && strcmp(root->token->vec->data, "(") == 0)) {
-                root = root->parent;
+            while ( ((root && (root->parent != NULL || root->prev != NULL)) && !(root->token->type == DELIMITER
+                && (strcmp(root->token->vec->data, "(") == 0) || (strcmp(root->token->vec->data, "()") == 0))) ) {
+                if (root->parent != NULL) {
+                    root = root->parent;
+                }
+                else {
+                    root = root->prev;
+                }
             }
             return root;
         }

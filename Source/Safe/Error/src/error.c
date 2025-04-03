@@ -21,7 +21,8 @@ char* errors[] = {
     "Invalid syntax\n" //13
     "Two binary OP\n" //14
     "Invalid AST\n" //15
-    "Error in if-else consruction\n" //16
+    "Error in if-else construction\n" //16
+    "Error in if-else construction\n" //17
 };
 
 

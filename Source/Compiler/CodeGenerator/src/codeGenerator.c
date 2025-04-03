@@ -508,7 +508,7 @@ void generate(Node* node, FILE* file) {
                     generate(node->next, file);
                 }
                 else {
-                    printErrorMessage(15);
+                    printErrorMessage(16);
                     return;
                 }
                 
@@ -549,17 +549,17 @@ void generate(Node* node, FILE* file) {
                 generate(node->right, file);
             }
             else {
-                printErrorMessage(15);
+                printErrorMessage(16);
                 return;
             }
-            fprintf(file, "beq a0, x0 .loop%d\n", t + 1);
+            fprintf(file, "beq a0, x0, .loop%d\n", t + 1);
 
             node = node->bottom;
             if (node && node->next && node->next->token && node->next->token->type == SCOPE_OPEN) {
                 generate(node->next, file);
             }
             else {
-                printErrorMessage(15);
+                printErrorMessage(16);
                 return;
             }
             
@@ -568,6 +568,32 @@ void generate(Node* node, FILE* file) {
 
             
         }
+        else if (node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "for") == 0) {
+            int t = counter;
+            counter += 2;
+            if (node && node->bottom && node->bottom->bottom && node->bottom->bottom->bottom) {
+                node = node->bottom;
+
+                generate(node->right, file);
+                fprintf(file, ".loop%d\n", t);
+                node = node->bottom;
+                
+                generate(node->next, file);
+
+                fprintf(file, "beq a0, x0, .loop%d\n", t + 1);
+                node = node->bottom;
+                generate(node->bottom->next, file);
+                generate(node->next, file);
+                node = node->bottom;
+                
+                fprintf(file, "j .loop%d\n", t);
+                fprintf(file, ".loop%d\n", t+1);
+            }
+            else {
+                printErrorMessage(17);
+            }
+        }
+        
         generate(node->bottom, file);
     }
 }
