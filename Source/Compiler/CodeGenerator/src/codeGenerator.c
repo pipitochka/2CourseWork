@@ -538,6 +538,36 @@ void generate(Node* node, FILE* file) {
                 return;
             }
         }
+        else if (node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "while") == 0) {
+            int t = counter;
+            counter += 2;
+            fprintf(file, ".loop%d\n", t);
+
+            if (node->bottom || node->bottom->token && node->bottom->token->type == DELIMITER
+                && strcmp(node->bottom->token->vec->data, "()") == 0) {
+                node = node->bottom;
+                generate(node->right, file);
+            }
+            else {
+                printErrorMessage(15);
+                return;
+            }
+            fprintf(file, "beq a0, x0 .loop%d\n", t + 1);
+
+            node = node->bottom;
+            if (node && node->next && node->next->token && node->next->token->type == SCOPE_OPEN) {
+                generate(node->next, file);
+            }
+            else {
+                printErrorMessage(15);
+                return;
+            }
+            
+            fprintf(file, "j .loop%d\n", t);
+            fprintf(file, ".loop%d\n", t+1);
+
+            
+        }
         generate(node->bottom, file);
     }
 }
