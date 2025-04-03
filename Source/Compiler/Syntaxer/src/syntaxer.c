@@ -7,10 +7,10 @@
 
 int isLastOp = 1;
 
-Triple* triple;
+Triple* tripleData;
 
 Triple* getTriple() {
-    return triple;
+    return tripleData;
 }
 
 
@@ -139,6 +139,7 @@ Node* addOperatorToken(Node* root, Token** token) {
         if (root->prev) {
             newNode->prev = root->prev;
             root->prev->next = newNode;
+            root->prev = NULL;
         }
         
         return newNode;
@@ -151,7 +152,7 @@ Node* addKwordToken(Node* root, Token** token) {
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
             if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    addTriple(&triple, label->vec->data, 4, VAR, 1);
+                    addTriple(&tripleData, label->vec->data, 4, VAR, 1);
                     if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
                         break;
                     }
@@ -173,7 +174,7 @@ Node* addKwordToken(Node* root, Token** token) {
                         && (strcmp(label->next->next->next->next->vec->data, ",")
                             || strcmp(label->next->next->next->next->vec->data, ";"))) {
                         int counter = atoi(label->next->next->vec->data);
-                        addTriple(&triple, label->vec->data, 4, MAS, counter);
+                        addTriple(&tripleData, label->vec->data, 4, MAS, counter);
                         label = label->next->next->next->next->next;
                             
                             }
@@ -183,7 +184,7 @@ Node* addKwordToken(Node* root, Token** token) {
                     }
                 }
                 else {
-                    addTriple(&triple, label->vec->data, 4, VAR, 1);
+                    addTriple(&tripleData, label->vec->data, 4, VAR, 1);
                     while (label && label->type != DELIMITER) {
                         label = label->next;
                     }
@@ -204,7 +205,7 @@ Node* addKwordToken(Node* root, Token** token) {
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
             if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    addTriple(&triple, label->vec->data, 1, VAR, 1);
+                    addTriple(&tripleData, label->vec->data, 1, VAR, 1);
                     if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
                         break;
                     }
@@ -226,7 +227,7 @@ Node* addKwordToken(Node* root, Token** token) {
                         && (strcmp(label->next->next->next->next->vec->data, ",")
                             || strcmp(label->next->next->next->next->vec->data, ";"))) {
                         int counter = atoi(label->next->next->vec->data);
-                        addTriple(&triple, label->vec->data, 1, MAS, counter);
+                        addTriple(&tripleData, label->vec->data, 1, MAS, counter);
                         label = label->next->next->next->next->next;
                             
                             }
@@ -236,7 +237,7 @@ Node* addKwordToken(Node* root, Token** token) {
                     }
                 }
                 else {
-                    addTriple(&triple, label->vec->data, 1, VAR, 1);
+                    addTriple(&tripleData, label->vec->data, 1, VAR, 1);
                     while (label && label->type != DELIMITER) {
                         label = label->next;
                     }
@@ -282,7 +283,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             isLastOp = 1;
             return newNode;
         }
-    else if (strcmp((*token)->vec->data, ";") == 0) {
+    else if (strcmp((*token)->vec->data, ",") == 0) {
             (*token) = (*token)->next;
             while (root->parent != NULL) {
                 root = root->parent;

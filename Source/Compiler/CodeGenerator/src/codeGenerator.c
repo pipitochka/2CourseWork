@@ -6,12 +6,12 @@
 
 int counter = 0;
 
-Triple* triple;
+Triple* tripleData;
 
 void startOfFile(FILE* file) {
     fprintf(file, ".data\n");
 
-    Triple* data = triple;
+    Triple* data = tripleData;
 
     while (data != NULL) {
         if (data->type == VAR) {
@@ -470,7 +470,7 @@ void generate(Node* node, FILE* file) {
         }
         else if (node->left == NULL && node->right == NULL && node->token && node->token->type == NAME
             && node->generated == 0) {
-            Triple* data = findTriple(triple, node->token->vec->data);
+            Triple* data = findTriple(tripleData, node->token->vec->data);
             if (data == NULL) {
                 return;
             }
@@ -499,7 +499,7 @@ void generate(Node* node, FILE* file) {
 }
 
 void generateCode(Node* code, char* fileName, Triple* _triple) {
-    triple = _triple;
+    tripleData = _triple;
     FILE* file = fopen(fileName, "w");
     if (file == NULL) {
         printErrorMessage(12);

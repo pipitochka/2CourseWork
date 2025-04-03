@@ -5,7 +5,6 @@ set(CMAKE_C_STANDARD 11)
 ##debug
 ##set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -g")
 
-
 file(GLOB VECTOR_RESOURSES Source/All/Vector/src/*.c)
 file(GLOB TOKEN_RESOURSES Source/All/Token/src/*.c)
 file(GLOB NODE_RESOURSES Source/All/Node/src/*.c)
@@ -17,8 +16,6 @@ file(GLOB ASSERT_SOURCES Source/Safe/SafeAssert/src/*.c)
 file(GLOB LEXER_SOURCES Source/Compiler/Lexer/src/*.c)
 file(GLOB SYNTAXER_SOURCES Source/Compiler/Syntaxer/src/*.c)
 file(GLOB CODE_GENERATOR_SOURCES Source/Compiler/CodeGenerator/src/*.c)
-
-
 
 add_library(Vector ${VECTOR_RESOURSES})
 add_library(Token ${TOKEN_RESOURSES})
@@ -34,7 +31,6 @@ add_executable(
         ccvc
         main.c
 )
-
 
 add_executable(
         lexer_tests
