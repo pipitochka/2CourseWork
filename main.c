@@ -8,8 +8,9 @@ int main() {
     Node* q = createAST(tokens);
     //printAST(q);
     
-    generateCode(q, "../text.out", getTriple());
-    
+    //generateCode(q, "../text.out", getTriple());
+    generateCode(q, "../text.out");
+
     
     freeNode(q);
     //printTokens(tokens);

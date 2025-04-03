@@ -8,7 +8,9 @@ void prepare(char* name, char* input, char* output) {
     Token* tokens = lexer(input);
     Node* q = createAST(tokens);
     
-    generateCode(q, output, getTriple());
+    //generateCode(q, output, getTriple());
+    generateCode(q, output);
+
     
     deleteTokens(tokens);
     freeNode(q);

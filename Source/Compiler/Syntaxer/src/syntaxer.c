@@ -9,9 +9,9 @@ int isLastOp = 1;
 
 Triple* tripleData;
 
-Triple* getTriple() {
-    return tripleData;
-}
+// Triple* getTriple() {
+//     return tripleData;
+// }
 
 
 void printAST(const Node* node) {
@@ -254,6 +254,16 @@ Node* addKwordToken(Node* root, Token** token) {
         return root;
     }
     else if (strcmp((*token)->vec->data, "if") == 0) {
+        Node* newNode = createNode();
+        newNode->parent = root;
+        newNode->token = (*token);
+        root->bottom = newNode;
+        *token = (*token)->next;
+        (*token)->vec->data[1] = ')';
+        pushBackVector((*token)->vec, '\0');
+        return newNode;
+    }
+    else if (strcmp((*token)->vec->data, "else") == 0) {
         Node* newNode = createNode();
         newNode->parent = root;
         newNode->token = (*token);

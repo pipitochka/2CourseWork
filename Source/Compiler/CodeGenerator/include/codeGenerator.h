@@ -5,6 +5,8 @@
 #include "../../../All/Triple//include/triple.h"
 
 
-void generateCode(Node* code, char* filename, Triple* triple);
+// void generateCode(Node* code, char* filename, Triple* triple);
+
+void generateCode(Node* code, char* filename);
 
 #endif //CODEGENERATOR_H
