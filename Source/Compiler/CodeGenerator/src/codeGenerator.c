@@ -498,7 +498,7 @@ void generate(Node* node, FILE* file) {
             if (node->bottom || node->bottom->token && node->bottom->token->type == DELIMITER
                 && strcmp(node->bottom->token->vec->data, "()") == 0) {
                 node = node->bottom;
-                generate(node->right, file);
+                generate(node->next, file);
                 int t = counter;
                 counter += 2;
                 fprintf(file, "beq a0, x0, .loop%d\n", t);
@@ -546,7 +546,7 @@ void generate(Node* node, FILE* file) {
             if (node->bottom || node->bottom->token && node->bottom->token->type == DELIMITER
                 && strcmp(node->bottom->token->vec->data, "()") == 0) {
                 node = node->bottom;
-                generate(node->right, file);
+                generate(node->next, file);
             }
             else {
                 printErrorMessage(16);
@@ -574,7 +574,7 @@ void generate(Node* node, FILE* file) {
             if (node && node->bottom && node->bottom->bottom && node->bottom->bottom->bottom) {
                 node = node->bottom;
 
-                generate(node->right, file);
+                generate(node->next, file);
                 fprintf(file, ".loop%d\n", t);
                 node = node->bottom;
                 

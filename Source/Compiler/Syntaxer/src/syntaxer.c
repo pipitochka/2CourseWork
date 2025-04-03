@@ -81,7 +81,8 @@ Node* addOperatorToken(Node* root, Token** token) {
     
     if (isLastOp && (*token)->type == BIN_OPERATOR) {
         isLastOp = 1;
-        if (token && *token && (strcmp((*token)->vec->data, "*") || strcmp((*token)->vec->data, "&"))) {
+        if (token && *token && (strcmp((*token)->vec->data, "*") == 0 || strcmp((*token)->vec->data, "&") == 0)
+            || strcmp((*token)->vec->data, "-") == 0) {
             newNode->token->type = UNAR_OPERATOR;
             newNode->token->order = 3;
         }
@@ -128,7 +129,12 @@ Node* addOperatorToken(Node* root, Token** token) {
     *token = (*token)->next;
     if (root->parent != NULL) {
         newNode->left = root;
-        root->parent->right = newNode;
+        if (root == root->parent->right) {
+            root->parent->right = newNode;
+        }
+        else {
+            root->parent->left = newNode;
+        }
         newNode->parent = root->parent;
         root->parent = newNode;
         return newNode;
@@ -333,9 +339,16 @@ Node* addDelimetrToken(Node* root, Token** token) {
             
             Node* newNode = createNode();
             newNode->type = NULL_NODE;
-            newNode->parent = root;
             newNode->token = *token;
             (*token) = (*token)->next;
+
+            if (root->type == DATA_NODE) {
+                root->next = newNode;
+                newNode->prev = root;
+                return newNode;
+            }
+
+            newNode->parent = root;
             if (root->right == NULL) {
                 root->right = newNode;
             }
@@ -347,10 +360,14 @@ Node* addDelimetrToken(Node* root, Token** token) {
     else if (strcmp((*token)->vec->data, ")") == 0) {
             isLastOp = 0;
             (*token) = (*token)->next;
-            while ( ((root && (root->parent != NULL || root->prev != NULL)) && !(root->token->type == DELIMITER
-                && (strcmp(root->token->vec->data, "(") == 0) || (strcmp(root->token->vec->data, "()") == 0))) ) {
+            while ( (root && (root->parent != NULL || root->prev != NULL || root->top != NULL) && !(root->token &&
+                root->token->type == DELIMITER
+                && ((strcmp(root->token->vec->data, "(") == 0) || (strcmp(root->token->vec->data, "()") == 0)))) ) {
                 if (root->parent != NULL) {
                     root = root->parent;
+                }
+                else if (root->top != NULL) {
+                    root = root->top;
                 }
                 else {
                     root = root->prev;
@@ -371,8 +388,10 @@ Node* addDelimetrToken(Node* root, Token** token) {
         Node* newNode = createNode();
         root->bottom = newNode;
         newNode->top = root;
+        newNode->type = DATA_NODE;
         newNode->token = (*token);
         (*token) = (*token)->next;
+        
         return newNode;
     }
     

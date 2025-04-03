@@ -484,7 +484,7 @@ Token* lexer(char* name) {
                                     pushBackVector(token->vec, '=');
                                     token->order = 9;
                                     token->type = BIN_OPERATOR;
-                                    if (feof(file)) {
+                                    if (!feof(file)) {
                                         c = fgetc(file);
                                     }
                                     else {
