@@ -6,7 +6,7 @@
 
 int counter = 0;
 
-Triple* tripleData;
+extern Triple* tripleData;
 
 void startOfFile(FILE* file) {
     fprintf(file, ".data\n");
