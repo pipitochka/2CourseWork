@@ -9,6 +9,7 @@ Variable* initVariable(char* name, int size, enum Type type, int nums) {
     triple->size = size;
     triple->type = type;
     triple->nums = nums;
+    triple->counter = 0;
     return triple;
 }
 

@@ -8,6 +8,7 @@ typedef struct Variable {
     int size;
     enum Type type;
     int nums;
+    int counter;
 } Variable;
 
 Variable* initVariable(char* name, int size, enum Type type, int nums);

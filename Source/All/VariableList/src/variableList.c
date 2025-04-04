@@ -5,23 +5,22 @@
 
 VariableList* initVariableList() {
     VariableList* variableList = (VariableList*)malloc(sizeof(VariableList));
-
     return variableList;
 }
 
 
 Variable* findVariable(VariableList* first, char* name) {
     if (first != NULL) {
-        if (strcmp(first->variable->name, name) == 0) {
-            return first->variable;
+        if (first->variable != NULL && first->variable->name != NULL) {
+            if (strcmp(first->variable->name, name) == 0) {
+                return first->variable;
+            }
         }
         else {
             return findVariable(first->next, name);
         }
     }
-    else {
-        return NULL;
-    }
+    return NULL;
 }
 
 void deleteVariableList(VariableList* first) {
@@ -46,6 +45,7 @@ void addVariable(VariableList** first, Variable* variable) {
     }
     VariableList* newVariableList = initVariableList();
     newVariableList->variable = variable;
+    newVariableList->counter = current->counter + 1;
     current->next = newVariableList;
 }
 

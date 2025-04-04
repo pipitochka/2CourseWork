@@ -5,6 +5,7 @@
 typedef struct VariableList {
     Variable* variable;
     struct VariableList* next;
+    int counter;
 } VariableList;
 
 VariableList* initVariableList();

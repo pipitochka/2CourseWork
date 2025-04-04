@@ -1,13 +1,19 @@
-#ifndef FUNCTION_H
-#define FUNCTION_H
+#ifndef FUNCTIONLIST_H
+#define FUNCTIONLIST_H
 
-#include "../../Variable/include/variable.h"
+#include "../../Function/include/function.h"
 
-enum ReturnType {RETURN_INT, RETURN_CHAR, RETURN_VOID};
+typedef struct FunctionList {
+    Function* function;
+    struct FunctionList* next;
+} FunctionList;
 
-typedef struct Function {
-    char *name;
-    enum ReturnType returnType;
-} Function;
+FunctionList* initFunctionList();
 
-#endif //FUNCTION_H
+FunctionList* findFunction(FunctionList* first, char* name);
+
+void deleteFunctionList(FunctionList* first);
+
+void addFunction(FunctionList** first, Function* function);
+
+#endif //FUNCTIONLIST_H

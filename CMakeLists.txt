@@ -67,10 +67,11 @@ target_link_libraries(Assert Token)
 
 target_link_libraries(Lexer Token)
 
-target_link_libraries(Syntaxer Node)
-
-
 target_link_libraries(FunctionList Function)
+
+target_link_libraries(Syntaxer Node)
+target_link_libraries(Syntaxer FunctionList)
+
 target_link_libraries(CodeGenerator Node)
 target_link_libraries(CodeGenerator FunctionList)
 
