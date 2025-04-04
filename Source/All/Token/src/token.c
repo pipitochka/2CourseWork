@@ -1,7 +1,9 @@
 #include "../include/token.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 
 Token* initToken() {
     Token* new = (Token*)malloc(sizeof(Token));

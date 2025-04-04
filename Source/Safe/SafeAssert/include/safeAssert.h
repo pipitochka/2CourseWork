@@ -3,6 +3,7 @@
 
 #include "../../../All/Token/include/token.h"
 
+
 int safeAssert(const int condition, Token * token);
 
 

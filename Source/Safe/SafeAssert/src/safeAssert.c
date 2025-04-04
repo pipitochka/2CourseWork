@@ -1,4 +1,5 @@
 #include "../include/safeAssert.h"
+
 #include "../../Error/include/error.h"
 
 int safeAssert(const int condition, Token * token){

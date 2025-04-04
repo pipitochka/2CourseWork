@@ -1,17 +1,14 @@
 #include "../include/syntaxer.h"
 #include "../../../Safe/Error/include/error.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 
 
 int isLastOp = 1;
 
-Triple* tripleData;
-
-// Triple* getTriple() {
-//     return tripleData;
-// }
+VariableList* variableList;
 
 
 void printAST(const Node* node) {
@@ -158,7 +155,8 @@ Node* addKwordToken(Node* root, Token** token) {
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
             if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    addTriple(&tripleData, label->vec->data, 4, VAR, 1);
+                    Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1);
+                    addVariable(&variableList, newVariable);
                     if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
                         break;
                     }
@@ -180,7 +178,8 @@ Node* addKwordToken(Node* root, Token** token) {
                         && (strcmp(label->next->next->next->next->vec->data, ",")
                             || strcmp(label->next->next->next->next->vec->data, ";"))) {
                         int counter = atoi(label->next->next->vec->data);
-                        addTriple(&tripleData, label->vec->data, 4, MAS, counter);
+                        Variable* newVariable = initVariable(label->vec->data, 4, MAS, counter);
+                        addVariable(&variableList, newVariable);
                         label = label->next->next->next->next->next;
                             
                             }
@@ -190,7 +189,8 @@ Node* addKwordToken(Node* root, Token** token) {
                     }
                 }
                 else {
-                    addTriple(&tripleData, label->vec->data, 4, VAR, 1);
+                    Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1);
+                    addVariable(&variableList, newVariable);
                     while (label && label->type != DELIMITER) {
                         label = label->next;
                     }
@@ -211,7 +211,8 @@ Node* addKwordToken(Node* root, Token** token) {
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
             if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    addTriple(&tripleData, label->vec->data, 1, VAR, 1);
+                    Variable* newVariable = initVariable(label->vec->data, 1, VAR, 1);
+                    addVariable(&variableList, newVariable);
                     if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
                         break;
                     }
@@ -233,7 +234,8 @@ Node* addKwordToken(Node* root, Token** token) {
                         && (strcmp(label->next->next->next->next->vec->data, ",")
                             || strcmp(label->next->next->next->next->vec->data, ";"))) {
                         int counter = atoi(label->next->next->vec->data);
-                        addTriple(&tripleData, label->vec->data, 1, MAS, counter);
+                        Variable* newVariable = initVariable(label->vec->data, 4, MAS, counter);
+                        addVariable(&variableList, newVariable);
                         label = label->next->next->next->next->next;
                             
                             }
@@ -243,7 +245,8 @@ Node* addKwordToken(Node* root, Token** token) {
                     }
                 }
                 else {
-                    addTriple(&tripleData, label->vec->data, 1, VAR, 1);
+                    Variable* newVariable = initVariable(label->vec->data, 1, VAR, 1);
+                    addVariable(&variableList, newVariable);
                     while (label && label->type != DELIMITER) {
                         label = label->next;
                     }
@@ -299,8 +302,6 @@ Node* addKwordToken(Node* root, Token** token) {
         pushBackVector((*token)->vec, '\0');
         return newNode;
     }
-    
-    
 }
 
 
@@ -478,8 +479,7 @@ Node* createAST(Token* token){
         return NULL;
     }
     Node* node = root;
-    // root->token = token;
-    // token = token->next;
+
     Token **tok = &token;
     while(token != NULL && node != NULL){
         node = addTokenToNode(node, tok);

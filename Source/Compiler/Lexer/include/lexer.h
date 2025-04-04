@@ -2,7 +2,6 @@
 #define LEXER_H
 
 #include "../../../All/Token/include/token.h"
-#include "../include/lexer.h"
 
 
 enum States {NONE_STATE, WORD_STATE, NUMBER_STATE, STRING_STATE, CHAR_STATE, SCOPE_STATE,

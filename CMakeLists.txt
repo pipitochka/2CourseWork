@@ -8,7 +8,10 @@ set(CMAKE_C_STANDARD 11)
 file(GLOB VECTOR_RESOURSES Source/All/Vector/src/*.c)
 file(GLOB TOKEN_RESOURSES Source/All/Token/src/*.c)
 file(GLOB NODE_RESOURSES Source/All/Node/src/*.c)
-file(GLOB TRIPLE_RESOURSES Source/All/Triple/src/*.c)
+file(GLOB VARIABLE_RESOURSES Source/All/Variable/src/*.c)
+file(GLOB FUNCTION_RESOURSES Source/All/Function/src/*.c)
+file(GLOB VARIABLELIST_RESOURSES Source/All/VariableList/src/*.c)
+file(GLOB FUNCTIONLIST_RESOURSES Source/All/FunctionList/src/*.c)
 
 file(GLOB ERROR_SOURCES Source/Safe/Error/src/*.c)
 file(GLOB ASSERT_SOURCES Source/Safe/SafeAssert/src/*.c)
@@ -20,9 +23,15 @@ file(GLOB CODE_GENERATOR_SOURCES Source/Compiler/CodeGenerator/src/*.c)
 add_library(Vector ${VECTOR_RESOURSES})
 add_library(Token ${TOKEN_RESOURSES})
 add_library(Node ${NODE_RESOURSES})
-add_library(Triple ${TRIPLE_RESOURSES})
+add_library(Variable ${VARIABLE_RESOURSES})
+add_library(Function ${FUNCTION_RESOURSES})
+
+add_library(VariableList ${VARIABLELIST_RESOURSES})
+add_library(FunctionList ${FUNCTIONLIST_RESOURSES})
+
 add_library(Error ${ERROR_SOURCES})
 add_library(Assert ${ASSERT_SOURCES})
+
 add_library(Lexer ${LEXER_SOURCES})
 add_library(Syntaxer ${SYNTAXER_SOURCES})
 add_library(CodeGenerator ${CODE_GENERATOR_SOURCES})
@@ -44,24 +53,27 @@ add_executable(
 
 
 target_link_libraries(Token Vector)
+target_link_libraries(Token Error)
 
 target_link_libraries(Node Token)
+
+target_link_libraries(VariableList Variable)
+target_link_libraries(Function VariableList)
+
+target_link_libraries(Node Token)
+target_link_libraries(Node Function)
 
 target_link_libraries(Assert Token)
 
 target_link_libraries(Lexer Token)
-target_link_libraries(Lexer Error)
 
-target_link_libraries(Syntaxer Token)
-target_link_libraries(Syntaxer Error)
 target_link_libraries(Syntaxer Node)
-target_link_libraries(Syntaxer Triple)
 
-target_link_libraries(CodeGenerator Token)
-target_link_libraries(CodeGenerator Error)
+
+target_link_libraries(FunctionList Function)
 target_link_libraries(CodeGenerator Node)
+target_link_libraries(CodeGenerator FunctionList)
 
-target_link_libraries(lexer_tests Token)
 target_link_libraries(lexer_tests Lexer)
 target_link_libraries(lexer_tests Assert)
 
@@ -82,6 +94,7 @@ target_include_directories(code_generator_tests PRIVATE Source/Compiler/Syntaxer
 target_include_directories(code_generator_tests PRIVATE Source/Compiler/CodeGenerator)
 
 target_include_directories(lexer_tests PRIVATE Source/Compiler/Lexer)
+target_include_directories(lexer_tests PRIVATE Source/Safe/SafeAssert)
 
 set_target_properties(lexer_tests PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests

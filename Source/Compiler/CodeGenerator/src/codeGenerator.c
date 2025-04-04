@@ -1,24 +1,23 @@
 #include "../include/codeGenerator.h"
 #include <stdio.h>
 #include <string.h>
-
 #include "../../../Safe/Error/include/error.h"
+
+
 
 int counter = 0;
 
-extern Triple* tripleData;
+extern VariableList* variableList;
 
 void startOfFile(FILE* file) {
     fprintf(file, ".data\n");
 
-    Triple* data = tripleData;
+    VariableList* data = variableList;
 
     while (data != NULL) {
-        if (data->type == VAR) {
-            fprintf(file, ".var %s\n", data->name);
+        if (data->variable->type == VAR) {
+            fprintf(file, ".var %s\n", data->variable->name);
         }
-
-        
         data = data->next;
     }
     
@@ -470,7 +469,7 @@ void generate(Node* node, FILE* file) {
         }
         else if (node->left == NULL && node->right == NULL && node->token && node->token->type == NAME
             && node->generated == 0) {
-            Triple* data = findTriple(tripleData, node->token->vec->data);
+            Variable* data = findVariable(variableList, node->token->vec->data);
             if (data == NULL) {
                 return;
             }

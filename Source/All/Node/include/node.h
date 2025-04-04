@@ -1,9 +1,9 @@
 #ifndef NODE_H
 #define NODE_H
-#include <stdbool.h>
-#include <stdlib.h>
+
 
 #include "../../Token/include/token.h"
+#include "../../Function/include/function.h"
 
 enum NodeType {NULL_NODE, DATA_NODE};
 
@@ -17,6 +17,7 @@ typedef struct Node{
     struct Node* prev;
     struct Node* bottom;
     struct Node* top;
+    Function* function;
     int generated;
 } Node;
 

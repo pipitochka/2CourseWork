@@ -18,6 +18,7 @@ Node* createNode(){
     node->prev = NULL;
     node->type = NULL_NODE;
     node->generated = 0;
+    node->function = NULL;
     return node;
 };
 

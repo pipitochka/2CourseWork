@@ -1,10 +1,9 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "../include/error.h"
 
-char* errors[] = {
+#include <stdlib.h>
+#include <stdio.h>
+
+const char* errors[] = {
     "error: unterminated string\n", //0
     "error: unterminated character\n",
     "Error in symbol %c\n",
