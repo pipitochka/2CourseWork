@@ -5,7 +5,7 @@
 #include "../../Token/include/token.h"
 #include "../../Function/include/function.h"
 
-enum NodeType {NULL_NODE, DATA_NODE};
+enum NodeType {NULL_NODE, DATA_NODE, FUNCTION, FUNCTION_CALL};
 
 typedef struct Node{
     Token* token;

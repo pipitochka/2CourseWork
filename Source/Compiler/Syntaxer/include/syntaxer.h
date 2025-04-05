@@ -2,6 +2,7 @@
 #define SYNTAXER_H
 
 #include "../../../All/Node/include/node.h"
+#include "../../../All/FunctionList/include/functionList.h"
 
 Node* createAST(Token* token);
 

@@ -9,10 +9,13 @@ FunctionList* initFunctionList() {
     return list;
 }
 
-FunctionList* findFunction(FunctionList* first, char* name) {
+Function* findFunction(FunctionList* first, char* name) {
     if (first != NULL) {
         if (first->function && first->function->name && strcmp(first->function->name, name) == 0) {
-            return first;
+            return first->function;
+        }
+        else {
+            return findFunction(first->next, name);
         }
     }
     return NULL;

@@ -1,6 +1,7 @@
 #include "Source/Compiler/Lexer/include/lexer.h"
 #include "Source/Compiler/Syntaxer/include/syntaxer.h"
 #include "Source/Compiler/CodeGenerator/include/codeGenerator.h"
+#include "Source/Safe/Error/include/error.h"
 
 
 int main() {
@@ -9,7 +10,7 @@ int main() {
     //printAST(q);
     
     generateCode(q, "../text.out");
-
+    
     
     freeNode(q);
     //printTokens(tokens);

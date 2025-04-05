@@ -10,7 +10,7 @@ typedef struct FunctionList {
 
 FunctionList* initFunctionList();
 
-FunctionList* findFunction(FunctionList* first, char* name);
+Function* findFunction(FunctionList* first, char* name);
 
 void deleteFunctionList(FunctionList* first);
 

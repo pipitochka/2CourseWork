@@ -9,9 +9,10 @@ typedef struct Variable {
     enum Type type;
     int nums;
     int counter;
+    int isRef;
 } Variable;
 
-Variable* initVariable(char* name, int size, enum Type type, int nums);
+Variable* initVariable(char* name, int size, enum Type type, int nums, int isRef);
 
 void deleteVariable(Variable* first);
 

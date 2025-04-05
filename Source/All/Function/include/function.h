@@ -12,6 +12,7 @@ typedef struct Function {
     VariableList *variables;
     int numParameters;
     int numVariables;
+    int currentOffset;
 } Function;
 
 Function *initFunction(char *name, enum ReturnType returnType);

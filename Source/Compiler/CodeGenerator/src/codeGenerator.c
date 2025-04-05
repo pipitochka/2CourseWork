@@ -7,28 +7,33 @@
 
 int counter = 0;
 
-extern VariableList* variableList;
+extern VariableList* globalVariables;
+
+extern Function* currentFunction;
+
+extern FunctionList* currentFunctionList;
 
 void startOfFile(FILE* file) {
     fprintf(file, ".data\n");
 
-    VariableList* data = variableList;
+
+    VariableList* data = globalVariables;
 
     while (data != NULL) {
         if (data->variable->type == VAR) {
-            fprintf(file, ".var %s\n", data->variable->name);
+            fprintf(file, "%s: .word 0\n", data->variable->name);
         }
         data = data->next;
     }
     
     fprintf(file, ".text\n");
-    fprintf(file, ".global _start\n");
+    fprintf(file, ".global main\n");
     fprintf(file, "\n");
 }
 
 void endOfFile(FILE* file) {
     fprintf(file, "\n");
-    fprintf(file, "li a0, 10\n");
+    fprintf(file, "li a7, 10\n");
     fprintf(file, "ecall\n");
 }
 
@@ -106,8 +111,87 @@ int getValue(Token* token) {
     }
 }
 
+void getToken(char* name, FILE* file, char* functionName, int down) {
+    Function* function = findFunction(currentFunctionList, functionName);
+    down *= 12;
+    int top = 0;
+    if (function) {
+        top += function->numParameters + function->numVariables;
+    }
+    top *= 12;
+    top += down;
+    top += currentFunction->currentOffset;
+    if (function != NULL) {
+        Variable* q;
+        q = findVariable(function->parameters, name);
+        if (q != NULL) {
+            int t = q->counter;
+            t *= 12;
+            top -= t;
+            fprintf(file, "addi a4, sp, %d\n", top-4);
+            fprintf(file, "lw a0, 0(a4)\n");
+            fprintf(file, "mv a1, a4\n");
+            fprintf(file, "lw a2, -8(a4)\n");
+            return;
+        }
+        q = findVariable(function->variables, functionName);
+        if (q != NULL) {
+            int t = q->counter;
+            t *= 12;
+            t += function->numParameters * 12;
+            top -= t;
+            fprintf(file, "addi a4, sp, %d\n", top-4);
+            fprintf(file, "lw a0, 0(a4)\n");
+            fprintf(file, "addi a4, a4, -4\n");
+            fprintf(file, "mv a1, a4\n");
+            fprintf(file, "lw a2, -4(a4)\n");
+            return;
+        }
+    }
+    Variable* q = findVariable(globalVariables, name);
+    if (q != NULL) {
+        fprintf(file, "la a1, %s\n", q->name);
+        fprintf(file, "lw a0, 0(a1)\n");
+        fprintf(file, "li a2, %d\n", q->size);
+    }
+    
+}
+
 void generate(Node* node, FILE* file) {
     if (node != NULL) {
+        if (node->function != NULL) {
+            fprintf(file, "%s:\n", node->function->name);
+            fprintf(file, "addi sp, sp, -4\n");
+            fprintf(file, "sw ra, 0(sp)\n");
+            currentFunction = node->function;
+            node->function->currentOffset = 4;
+            node = node->bottom;
+            generate(node->next, file);
+            fprintf(file, "lw ra, 0(sp)\n");
+            fprintf(file, "addi sp, sp, 4\n");
+            fprintf(file, "ret\n");
+            fprintf(file, "## end function %s\n", node->top->function->name);
+            node = node->bottom;
+        }
+        if (node->type == FUNCTION_CALL) {
+            Node* q = node->next;
+            int counter = 0;
+            while (q && q->token) {
+                getToken(q->token->vec->data, file, node->token->vec->data, counter);
+                fprintf(file, "addi sp, sp, -4\n");
+                fprintf(file, "sw a0, 0(sp)\n");
+                fprintf(file, "addi sp, sp, -4\n");
+                fprintf(file, "sw a1, 0(sp)\n");
+                fprintf(file, "addi sp, sp, -4\n");
+                fprintf(file, "sw a2, 0(sp)\n");
+                q = q->bottom;
+                counter++;
+            }
+            Function * function = findFunction(currentFunctionList, node->token->vec->data);
+            fprintf(file, "call %s\n", node->token->vec->data);
+            fprintf(file, "addi sp, sp, %d\n", (function->numParameters + function->numVariables) * 12);
+            node = node->bottom;
+        }
         if (!(node->next &&
             (node->next->token->type == NUMBER
                 || node->next->token->type == STRING
@@ -120,6 +204,9 @@ void generate(Node* node, FILE* file) {
             generate(node->right, file);
             if (node->right) {
                 node->right->generated = 1;
+                if (currentFunction != NULL) {
+                    currentFunction->currentOffset += 12;
+                }
                 fprintf(file, "addi sp, sp, -4\n");
                 fprintf(file, "sw a0, 0(sp)\n");
                 fprintf(file, "addi sp, sp, -4\n");
@@ -133,6 +220,9 @@ void generate(Node* node, FILE* file) {
                 node->left->generated = 1;
             }
             if (node->right) {
+                if (currentFunction != NULL) {
+                    currentFunction->currentOffset -= 12;
+                }
                 fprintf(file, "lw a5, 0(sp)\n");
                 fprintf(file, "addi sp, sp, 4\n");
                 fprintf(file, "lw a4, 0(sp)\n");
@@ -469,13 +559,7 @@ void generate(Node* node, FILE* file) {
         }
         else if (node->left == NULL && node->right == NULL && node->token && node->token->type == NAME
             && node->generated == 0) {
-            Variable* data = findVariable(variableList, node->token->vec->data);
-            if (data == NULL) {
-                return;
-            }
-            fprintf(file, "la a1, %s\n", data->name);
-            fprintf(file, "lw a0, 0(a1)\n");
-            fprintf(file, "la a2, %d\n", data->size);
+            getToken(node->token->vec->data, file, currentFunction->name, 0);
         }
         else if (node->left == NULL && node->right == NULL && node->token && node->token->type == NUMBER
             && node->generated == 0) {
@@ -597,18 +681,6 @@ void generate(Node* node, FILE* file) {
     }
 }
 
-// void generateCode(Node* code, char* fileName, Triple* _triple) {
-//     tripleData = _triple;
-//     FILE* file = fopen(fileName, "w");
-//     if (file == NULL) {
-//         printErrorMessage(12);
-//         return;
-//     }
-//     fprintf(file, "// Generated by codeGenerator\n");
-//     startOfFile(file);
-//     generate(code, file);
-//     endOfFile(file);
-// }
 
 void generateCode(Node* code, char* fileName) {
     FILE* file = fopen(fileName, "w");
@@ -616,7 +688,7 @@ void generateCode(Node* code, char* fileName) {
         printErrorMessage(12);
         return;
     }
-    fprintf(file, "// Generated by codeGenerator\n");
+    fprintf(file, "## Generated by codeGenerator\n");
     startOfFile(file);
     generate(code, file);
     endOfFile(file);

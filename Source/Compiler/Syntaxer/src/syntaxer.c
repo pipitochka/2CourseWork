@@ -4,12 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+int depth = 0;
 
 int isLastOp = 1;
 
-VariableList* variableList;
+VariableList* globalVariables = NULL;
 
+Function* currentFunction = NULL;
+
+FunctionList* currentFunctionList = NULL;
 
 void printAST(const Node* node) {
     if (node == NULL) {
@@ -46,7 +49,41 @@ void printAST(const Node* node) {
 
 Node* addIncludeToken(Node* root, Token** token) {}
 
+Node* callFunction(Node* root, Token** token) {
+    Function* function = findFunction(currentFunctionList, (*token)->vec->data);
+    Node* newNode = createNode();
+    root->bottom = newNode;
+    newNode->top = root;
+    newNode->token = *token;
+    newNode->type = FUNCTION_CALL;
+    *token = (*token)->next;
+    Node* newRoot = createNode();
+    newRoot->prev = newNode;
+    newNode->next = newRoot;
+    if (strcmp((*token)->vec->data, "(") == 0) {
+        *token = (*token)->next;
+        while (*token && !(strcmp((*token)->vec->data, ")") == 0)) {
+            if ((*token)->type == NAME) {
+                newRoot->token = (*token);
+                Node* newN = createNode();
+                newRoot->bottom = newN;
+                newN->top = newRoot;
+                newRoot = newN;
+            }
+            *token = (*token)->next;
+        }
+        if (*token && strcmp((*token)->vec->data, ")") == 0) {
+            *token = (*token)->next;;
+        }    
+        return newNode;
+    }
+    return NULL;
+}
+
 Node* addOrdinaryToken(Node* root, Token** token) {
+    if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
+        return callFunction(root, token);        
+    }
     isLastOp = 0;
     Node* newNode = createNode();
     newNode->token = *token;
@@ -152,25 +189,68 @@ Node* addOperatorToken(Node* root, Token** token) {
 Node* addKwordToken(Node* root, Token** token) {
     if (strcmp((*token)->vec->data, "int") == 0) {
         Token* label = (*token)->next;
+        //указатели
+        int isRef = 0;
+        if (label && strcmp(label->vec->data, "*") == 0) {
+            label = label->next;
+            isRef = 1;
+        }
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
-            if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
+            if (label && (label->type == NAME || (label->type == KWORD &&  strcmp(label->vec->data, "main") == 0))
+                && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1);
-                    addVariable(&variableList, newVariable);
+                    if (findVariable(globalVariables, label->next->vec->data) != NULL) {
+                        printErrorMessage(18);
+                    }
+                    else {
+                        Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1, isRef);
+                        if (currentFunction == NULL) {
+                            addVariable(&globalVariables, newVariable);
+                        }
+                        else {
+                            addVariableToFunction(currentFunction, newVariable);
+                        }
+                    }
                     if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
                         break;
                     }
                     label = label->next->next;
                     
                 }
-                //function
-                else if (label->next->vec->data == "(") {
+                else if (strcmp(label->next->vec->data, "(") == 0) {
+                    Function* newFunction = initFunction(label->vec->data, RETURN_INT);
+                    currentFunction = newFunction;
+
+                    addFunction(&currentFunctionList, newFunction);
+                    Node* newNode = createNode();
+                    newNode->token = *token;
+                    root->bottom = newNode;
+                    newNode->top = root;
                     
+                    newNode->function = newFunction;
+                    
+                    label = label->next;
+                    while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ")") == 0)) {
+                        if (label->type == NAME) {
+                            Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1, 1);
+                            addParametrToFunction(newFunction, newVariable);
+                        }
+                        label = label->next;
+                    }
+                    if (label->type == DELIMITER && strcmp(label->vec->data, ")") == 0) {
+                        label = label->next;
+                    }
+                    (*token) = label;
+                    return newNode;
                 }
                 
             }
             else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
                 if (strcmp(label->next->vec->data, "[") == 0) {
+                    if (isRef) {
+                        printErrorMessage(19);
+                        return NULL;
+                    }
                     if (label->next->next && label->next->next->type == NUMBER
                         && label->next->next->next && label->next->next->next->type == DELIMITER
                         && strcmp(label->next->next->next->vec->data, "]") == 0
@@ -178,8 +258,19 @@ Node* addKwordToken(Node* root, Token** token) {
                         && (strcmp(label->next->next->next->next->vec->data, ",")
                             || strcmp(label->next->next->next->next->vec->data, ";"))) {
                         int counter = atoi(label->next->next->vec->data);
-                        Variable* newVariable = initVariable(label->vec->data, 4, MAS, counter);
-                        addVariable(&variableList, newVariable);
+                            
+                        if (findVariable(globalVariables, label->next->vec->data) != NULL) {
+                            printErrorMessage(18);
+                        }
+                        else {
+                            Variable* newVariable = initVariable(label->vec->data, 4, MAS, counter, 1);
+                            if (currentFunction == NULL) {
+                                addVariable(&globalVariables, newVariable);
+                            }
+                            else {
+                                addVariableToFunction(currentFunction, newVariable);
+                            }
+                        }
                         label = label->next->next->next->next->next;
                             
                             }
@@ -189,8 +280,18 @@ Node* addKwordToken(Node* root, Token** token) {
                     }
                 }
                 else {
-                    Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1);
-                    addVariable(&variableList, newVariable);
+                    if (findVariable(globalVariables, label->next->vec->data) != NULL) {
+                        printErrorMessage(18);
+                    }
+                    else {
+                        Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1, isRef);
+                        if (currentFunction == NULL) {
+                            addVariable(&globalVariables, newVariable);
+                        }
+                        else {
+                            addVariableToFunction(currentFunction, newVariable);
+                        }
+                    }
                     while (label && label->type != DELIMITER) {
                         label = label->next;
                     }
@@ -201,67 +302,15 @@ Node* addKwordToken(Node* root, Token** token) {
             }
             else {
                 printErrorMessage(13);
+                return NULL;
             }
         }
         (*token) = (*token)->next;
         return root;
+        
+        
     }
-    else if (strcmp((*token)->vec->data, "char") == 0) {
-        Token* label = (*token)->next;
-        while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
-            if (label && label->type == NAME && label->next && (label->next->type == DELIMITER)) {
-                if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
-                    Variable* newVariable = initVariable(label->vec->data, 1, VAR, 1);
-                    addVariable(&variableList, newVariable);
-                    if (label && label->next && strcmp(label->next->vec->data, ";") == 0) {
-                        break;
-                    }
-                    label = label->next->next;
-                    
-                }
-                //function
-                else if (label->next->vec->data == "(") {
-                    
-                }
-                
-            }
-            else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
-                if (strcmp(label->next->vec->data, "[") == 0) {
-                    if (label->next->next && label->next->next->type == NUMBER
-                        && label->next->next->next && label->next->next->next->type == DELIMITER
-                        && strcmp(label->next->next->next->vec->data, "]") == 0
-                        && label->next->next->next->next && label->next->next->next->next->type == DELIMITER
-                        && (strcmp(label->next->next->next->next->vec->data, ",")
-                            || strcmp(label->next->next->next->next->vec->data, ";"))) {
-                        int counter = atoi(label->next->next->vec->data);
-                        Variable* newVariable = initVariable(label->vec->data, 4, MAS, counter);
-                        addVariable(&variableList, newVariable);
-                        label = label->next->next->next->next->next;
-                            
-                            }
-                    else {
-                        printErrorMessage(14);
-                        return NULL;
-                    }
-                }
-                else {
-                    Variable* newVariable = initVariable(label->vec->data, 1, VAR, 1);
-                    addVariable(&variableList, newVariable);
-                    while (label && label->type != DELIMITER) {
-                        label = label->next;
-                    }
-                    if (label && label->type == DELIMITER && strcmp(label->vec->data, ";") != 0) {
-                        label = label->next;
-                    }
-                }
-            }
-            else {
-                printErrorMessage(13);
-            }
-        }
-        (*token) = (*token)->next;
-        return root;
-    }
+    //char to do
     else if (strcmp((*token)->vec->data, "if") == 0) {
         Node* newNode = createNode();
         newNode->parent = root;
@@ -302,8 +351,8 @@ Node* addKwordToken(Node* root, Token** token) {
         pushBackVector((*token)->vec, '\0');
         return newNode;
     }
+    return NULL;
 }
-
 
 Node* addDelimetrToken(Node* root, Token** token) {
     if (strcmp((*token)->vec->data, ";") == 0) {
@@ -399,6 +448,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
 }
 
 Node* addScopeOpenToken(Node* root, Token** token) {
+    depth++;
     Node* newNode = createNode();
     root->bottom = newNode;
     newNode->top = root;
@@ -420,6 +470,14 @@ Node* addScopeOpenToken(Node* root, Token** token) {
 }
 
 Node* addScopeCloseToken(Node* root, Token** token) {
+    depth--;
+    if (depth < 0) {
+        printErrorMessage(20);
+        return NULL;
+    }
+    if (depth == 0) {
+        currentFunction = NULL;
+    }
     Node* newRoot = createNode();
     if (newRoot == NULL) {
         return NULL;

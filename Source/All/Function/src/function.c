@@ -10,6 +10,7 @@ Function *initFunction(char *name, enum ReturnType returnType) {
     function->variables = NULL;
     function->numParameters = 0;
     function->numVariables = 0;
+    function->currentOffset = 0;
     return function;
 }
 
