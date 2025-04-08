@@ -4,12 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../../../Safe/Error/include/error.h"
+
 
 Token* initToken() {
     Token* new = (Token*)malloc(sizeof(Token));
     if (new == NULL) {
-        printf("Token allocation failed\n");
-        exit(-1);
+        printErrorMessage(5);
+        return NULL;
     }
     new->vec = initVector();
     new->next = NULL;

@@ -3,8 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../../Safe/Error/include/error.h"
+
 VariableList* initVariableList() {
     VariableList* variableList = (VariableList*)malloc(sizeof(VariableList));
+    if (variableList == NULL) {
+        printErrorMessage(5);
+        return NULL;
+    }
     return variableList;
 }
 

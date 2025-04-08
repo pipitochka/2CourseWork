@@ -15,7 +15,7 @@ Token* lexer(char* name) {
     token->next = NULL;
     file = fopen(name, "r");
     if (file == NULL) {
-        printErrorMessage(6);
+        printErrorMessage(4);
         return NULL;
     }
 

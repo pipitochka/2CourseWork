@@ -3,9 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../../Safe/Error/include/error.h"
+
 FunctionList* initFunctionList() {
     FunctionList* list = (FunctionList*)malloc(sizeof(FunctionList));
-
+    if (list == NULL) {
+        printErrorMessage(5);
+        return NULL;
+    }
     return list;
 }
 

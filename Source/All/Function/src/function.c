@@ -1,9 +1,13 @@
 #include "../include/function.h"
-
+#include "../../../Safe/Error/include/error.h"
 #include <stdlib.h>
 
 Function *initFunction(char *name, enum ReturnType returnType) {
     Function *function = (Function *) malloc(sizeof(Function));
+    if (function == NULL) {
+        printErrorMessage(5);
+        return NULL;
+    }
     function->name = name;
     function->returnType = returnType;
     function->parameters = NULL;

@@ -5,7 +5,7 @@
 Node* createNode(){
     Node* node = (Node *)malloc(sizeof(Node));
     if(node == NULL) {
-        printErrorMessage(7);
+        printErrorMessage(5);
         return NULL;
     }
     node->token = NULL;

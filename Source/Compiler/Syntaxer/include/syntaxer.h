@@ -8,6 +8,4 @@ Node* createAST(Token* token);
 
 void printAST(const Node* node);
 
-Variable* getTriple();
-
 #endif //SYNTAXER_H

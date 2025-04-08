@@ -3,19 +3,21 @@
 #include <string.h>
 #include "../include/vector.h"
 
+#include "../../../Safe/Error/include/error.h"
+
 //allocate memory for vector
 Vector* initVector() {
     Vector* vec = (Vector*)malloc(sizeof(Vector));
     if (vec == NULL) {
-        printf("Error in allocation memory for Vector\n");
+        printErrorMessage(5);
         return NULL;
     }
     vec->size = 0;
     vec->capacity = 1;
     vec->data = malloc(vec->capacity * sizeof(char));
     if (vec->data == NULL) {
-        printf("Error in allocation memory for elements of Vector\n");
-        exit(-1);
+        printErrorMessage(5);
+        return NULL;
     }
     return vec;
 }
@@ -34,8 +36,8 @@ void pushBackVector(Vector* vec, const char q) {
         vec->capacity *= 2;
         char * new;
         if ((new = malloc(vec->capacity * sizeof(char))) == NULL) {
-            printf("Error in allocation memory for elements of Vector\n");
-            exit(-1);
+            printErrorMessage(5);
+            return;
         }
         memcpy(new, vec->data, vec->size * sizeof(char));
         free(vec->data);

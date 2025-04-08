@@ -47,11 +47,25 @@ void printAST(const Node* node) {
     }
 }
 
-Node* addIncludeToken(Node* root, Token** token) {}
+Node* addIncludeToken(Node* root, Token** token) {
+    return NULL;
+}
 
 Node* callFunction(Node* root, Token** token) {
+    if (token == NULL || *token == NULL || root == NULL) {
+        return NULL;
+    }
+    if (*(token) == NULL) {
+        return NULL;
+    }
     Function* function = findFunction(currentFunctionList, (*token)->vec->data);
+    if (function == NULL) {
+        return NULL;
+    }
     Node* newNode = createNode();
+    if (newNode == NULL) {
+        return NULL;
+    }
     root->bottom = newNode;
     newNode->top = root;
     newNode->token = *token;
@@ -62,13 +76,16 @@ Node* callFunction(Node* root, Token** token) {
     newNode->next = newRoot;
     if (strcmp((*token)->vec->data, "(") == 0) {
         *token = (*token)->next;
-        while (*token && !(strcmp((*token)->vec->data, ")") == 0)) {
+        while (*token && !((*token)->vec && strcmp((*token)->vec->data, ")") == 0)) {
             if ((*token)->type == NAME) {
                 newRoot->token = (*token);
                 Node* newN = createNode();
                 newRoot->bottom = newN;
                 newN->top = newRoot;
                 newRoot = newN;
+            }
+            else {
+                printErrorMessage(14);
             }
             *token = (*token)->next;
         }
@@ -77,15 +94,24 @@ Node* callFunction(Node* root, Token** token) {
         }    
         return newNode;
     }
+    else {
+        printErrorMessage(13);
+    }
     return NULL;
 }
 
 Node* addOrdinaryToken(Node* root, Token** token) {
+    if (token == NULL || *token == NULL || root == NULL) {
+        return NULL;
+    }
     if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
         return callFunction(root, token);        
     }
     isLastOp = 0;
     Node* newNode = createNode();
+    if (newNode == NULL) {
+        return NULL;
+    }
     newNode->token = *token;
     *token = (*token)->next;
 
@@ -110,13 +136,21 @@ Node* addOrdinaryToken(Node* root, Token** token) {
 }
 
 Node* addOperatorToken(Node* root, Token** token) {
+    if (token == NULL || *token == NULL || root == NULL) {
+        return NULL;
+    }
     Node* newNode = createNode();
+    if (newNode == NULL) {
+        return NULL;
+    }
     newNode->token = *token;
     
     if (isLastOp && (*token)->type == BIN_OPERATOR) {
         isLastOp = 1;
-        if (token && *token && (strcmp((*token)->vec->data, "*") == 0 || strcmp((*token)->vec->data, "&") == 0)
-            || strcmp((*token)->vec->data, "-") == 0) {
+        if (token && *token && (*token)->vec && (
+            strcmp((*token)->vec->data, "*") == 0
+            || strcmp((*token)->vec->data, "&") == 0
+            || strcmp((*token)->vec->data, "-") == 0)) {
             newNode->token->type = UNAR_OPERATOR;
             newNode->token->order = 3;
         }
@@ -130,7 +164,7 @@ Node* addOperatorToken(Node* root, Token** token) {
     }
 
     
-    while (root->parent != NULL  &&
+    while (root && root->parent != NULL  &&
         ((root->parent->token != NULL
             && (root->parent->token->type == BIN_OPERATOR || root->parent->token->type == UNAR_OPERATOR)
             && (root->parent->token->order < (*token)->order))
@@ -138,22 +172,23 @@ Node* addOperatorToken(Node* root, Token** token) {
         root = root->parent;
     }
     
-    
-
     if ((*token)->type == UNAR_OPERATOR) {
         *token = (*token)->next;
-        if (root->type == DATA_NODE) {
+        if (root && root->type == DATA_NODE) {
             root->next = newNode;
             newNode->prev = root;
             return newNode;
         }
         
-        if (root->left == NULL) {
+        if (root && root->left == NULL) {
             root->left = newNode;
             newNode->parent = root;
             return newNode;
         }
         else {
+            if (root == NULL) {
+                return NULL;
+            }
             root->right = newNode;
             newNode->parent = root;
             return newNode;
@@ -161,7 +196,7 @@ Node* addOperatorToken(Node* root, Token** token) {
     }
     
     *token = (*token)->next;
-    if (root->parent != NULL) {
+    if (root && root->parent != NULL) {
         newNode->left = root;
         if (root == root->parent->right) {
             root->parent->right = newNode;
@@ -174,6 +209,9 @@ Node* addOperatorToken(Node* root, Token** token) {
         return newNode;
     }
     else {
+        if (root == NULL) {
+            return NULL;
+        }
         newNode->left = root;
         root->parent = newNode;
         if (root->prev) {
@@ -184,9 +222,13 @@ Node* addOperatorToken(Node* root, Token** token) {
         
         return newNode;
     }
+    return NULL;
 }
 
 Node* addKwordToken(Node* root, Token** token) {
+    if (token == NULL || *token == NULL || root == NULL) {
+        return NULL;
+    }
     if (strcmp((*token)->vec->data, "int") == 0) {
         Token* label = (*token)->next;
         //указатели
@@ -310,33 +352,56 @@ Node* addKwordToken(Node* root, Token** token) {
         
         
     }
-    //char to do
     else if (strcmp((*token)->vec->data, "if") == 0) {
         Node* newNode = createNode();
+        if (newNode == NULL) {
+            return NULL;
+        }
         newNode->parent = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+        if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
+            || strcmp((*token)->vec->data, "(") != 0) {
+            printErrorMessage(15);
+            return NULL;
+        }
         (*token)->vec->data[1] = ')';
         pushBackVector((*token)->vec, '\0');
         return newNode;
     }
     else if (strcmp((*token)->vec->data, "else") == 0) {
         Node* newNode = createNode();
+        if (newNode == NULL) {
+            return NULL;
+        }
         newNode->parent = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+        if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
+            || strcmp((*token)->vec->data, "(") != 0) {
+            printErrorMessage(15);
+            return NULL;
+            }
         (*token)->vec->data[1] = ')';
         pushBackVector((*token)->vec, '\0');
         return newNode;
     }
     else if (strcmp((*token)->vec->data, "while") == 0) {
         Node* newNode = createNode();
+        if (newNode == NULL) {
+            return NULL;
+        }
         newNode->parent = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+        if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
+            || strcmp((*token)->vec->data, "(") != 0) {
+            printErrorMessage(15);
+            return NULL;
+            }
         (*token)->vec->data[1] = ')';
         pushBackVector((*token)->vec, '\0');
         return newNode;
@@ -347,6 +412,11 @@ Node* addKwordToken(Node* root, Token** token) {
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+        if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
+            || strcmp((*token)->vec->data, "(") != 0) {
+            printErrorMessage(15);
+            return NULL;
+            }
         (*token)->vec->data[1] = ')';
         pushBackVector((*token)->vec, '\0');
         return newNode;
@@ -355,6 +425,9 @@ Node* addKwordToken(Node* root, Token** token) {
 }
 
 Node* addDelimetrToken(Node* root, Token** token) {
+    if (root == NULL || token == NULL||(*token) == NULL) {
+        return NULL;
+    }
     if (strcmp((*token)->vec->data, ";") == 0) {
             (*token) = (*token)->next;
             while (root->parent != NULL) {
@@ -364,6 +437,9 @@ Node* addDelimetrToken(Node* root, Token** token) {
                 root = root->prev;
             }
             Node* newNode = createNode();
+            if (newNode == NULL) {
+                return NULL;
+            }
             newNode->type = DATA_NODE;
             newNode->top = root;
             root->bottom = newNode;
@@ -372,22 +448,31 @@ Node* addDelimetrToken(Node* root, Token** token) {
         }
     else if (strcmp((*token)->vec->data, ",") == 0) {
             (*token) = (*token)->next;
-            while (root->parent != NULL) {
+            while (root && root->parent != NULL) {
                 root = root->parent;
             }
-            if (root->prev) {
+            if (root && root->prev) {
                 root = root->prev;
             }
             Node* newNode = createNode();
+            if (newNode == NULL) {
+                return NULL;
+            }
             newNode->type = DATA_NODE;
             newNode->top = root;
-            root->bottom = newNode;
+            if (root) {
+                root->bottom = newNode;
+            } else {
+                return NULL;
+            }
             return newNode;
         }
     else if (strcmp((*token)->vec->data, "(") == 0) {
             isLastOp = 1;
-            
             Node* newNode = createNode();
+        if (newNode == NULL) {
+            return NULL;
+        }
             newNode->type = NULL_NODE;
             newNode->token = *token;
             (*token) = (*token)->next;
@@ -436,6 +521,9 @@ Node* addDelimetrToken(Node* root, Token** token) {
         }
     else if (strcmp((*token)->vec->data, "()") == 0) {
         Node* newNode = createNode();
+        if (newNode == NULL) {
+            return NULL;
+        }
         root->bottom = newNode;
         newNode->top = root;
         newNode->type = DATA_NODE;
@@ -444,7 +532,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
         
         return newNode;
     }
-    
+    return NULL;
 }
 
 Node* addScopeOpenToken(Node* root, Token** token) {
@@ -472,7 +560,7 @@ Node* addScopeOpenToken(Node* root, Token** token) {
 Node* addScopeCloseToken(Node* root, Token** token) {
     depth--;
     if (depth < 0) {
-        printErrorMessage(20);
+        printErrorMessage(16);
         return NULL;
     }
     if (depth == 0) {
@@ -487,17 +575,20 @@ Node* addScopeCloseToken(Node* root, Token** token) {
     root->bottom = newRoot;
     newRoot->top = root;
     
-    while (root != NULL && root->top != NULL) {
+    while (root && root->top != NULL) {
         root = root->top;
     }
-    if (root->prev != NULL) {
+    if (root && root->prev != NULL) {
         root = root->prev;
     }
     else {
-        printErrorMessage(10);
+        printErrorMessage(12);
     }
     newRoot = createNode();
     newRoot->top = root;
+    if (root == NULL) {
+        return NULL;
+    }
     root->bottom = newRoot;
     newRoot->type = DATA_NODE;
     
@@ -530,14 +621,15 @@ Node* addTokenToNode(Node* root, Token** token) {
 };
 
 Node* createAST(Token* token){
-    Node* root = createNode();
-    root->type = DATA_NODE;
-    if (root == NULL){
-        deleteTokens(token);
+    if (token == NULL) {
         return NULL;
     }
+    Node* root = createNode();
+    if (root == NULL){
+        return NULL;
+    }
+    root->type = DATA_NODE;
     Node* node = root;
-
     Token **tok = &token;
     while(token != NULL && node != NULL){
         node = addTokenToNode(node, tok);
