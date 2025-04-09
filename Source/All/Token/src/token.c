@@ -49,7 +49,6 @@ char* keywords[] = {
     "while",
     "int",
     "char",
-    "main",
     "true",
     "false",
     "if",

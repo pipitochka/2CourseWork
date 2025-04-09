@@ -21,7 +21,8 @@ const char* errors[] = {
     "error: unterminated ( in function call", // 14
     "error: invalid syntax in operation kword, no ( after", // 15
     "error: not enough {", // 16
-    "error: using unexpected variable" // 17
+    "error: using unexpected variable", // 17
+    "error: no function main" // 18
 };
 
 
