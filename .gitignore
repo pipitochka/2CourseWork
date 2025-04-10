@@ -1,3 +1,5 @@
 cmake-build-debug
 .DS_store
 .idea
+text.in
+text.out
