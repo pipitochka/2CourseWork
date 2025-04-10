@@ -182,21 +182,28 @@ void generate(Node* node, FILE* file) {
     if (node != NULL) {
         if (node->function != NULL) {
             fprintf(file, "%s:\n", node->function->name);
+            currentFunction = node->function;
             if (strcmp(node->function->name, "main") == 0) {
                 isMainExist = 1;
-                prepareForMain(node, file);
+                fprintf(file, "addi sp, sp, %d\n", (currentFunction->numVariables) * -4);
+                node = node->bottom;
+                generate(node->next, file);
+                fprintf(file, "addi sp, sp, %d\n", (currentFunction->numVariables) * 4);
+                fprintf(file, "## end function %s\n", node->top->function->name);
+                node = node->bottom;
             }
-            fprintf(file, "addi sp, sp, -4\n");
-            fprintf(file, "sw ra, 0(sp)\n");
-            currentFunction = node->function;
-            node->function->currentOffset = 4;
-            node = node->bottom;
-            generate(node->next, file);
-            fprintf(file, "lw ra, 0(sp)\n");
-            fprintf(file, "addi sp, sp, 4\n");
-            fprintf(file, "ret\n");
-            fprintf(file, "## end function %s\n", node->top->function->name);
-            node = node->bottom;
+            else {
+                fprintf(file, "addi sp, sp, -4\n");
+                fprintf(file, "sw ra, 0(sp)\n");
+                node->function->currentOffset = 4;
+                node = node->bottom;
+                generate(node->next, file);
+                fprintf(file, "lw ra, 0(sp)\n");
+                fprintf(file, "addi sp, sp, 4\n");
+                fprintf(file, "ret\n");
+                fprintf(file, "## end function %s\n", node->top->function->name);
+                node = node->bottom;
+            }
         }
         if (node->type == FUNCTION_CALL) {
             Node* q = node->next;
