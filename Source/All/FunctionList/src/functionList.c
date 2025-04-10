@@ -15,13 +15,14 @@ FunctionList* initFunctionList() {
 }
 
 Function* findFunction(FunctionList* first, char* name) {
-    if (first != NULL) {
-        if (first->function && first->function->name && strcmp(first->function->name, name) == 0) {
+    if (first != NULL && name != NULL) {
+        if (first->function != NULL && first->function->name != NULL && strcmp(first->function->name, name) == 0) {
             return first->function;
         }
-        else {
+        if (first->next != NULL && first->next->function != NULL) {
             return findFunction(first->next, name);
         }
+        return NULL;
     }
     return NULL;
 }

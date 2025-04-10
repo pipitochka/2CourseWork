@@ -259,7 +259,7 @@ Node* addKwordToken(Node* root, Token** token) {
     if (token == NULL || *token == NULL || root == NULL) {
         return NULL;
     }
-    if (strcmp((*token)->vec->data, "int") == 0) {
+    if (strcmp((*token)->vec->data, "int") == 0 || strcmp((*token)->vec->data, "char") == 0) {
         Token* label = (*token)->next;
         //указатели
         int isRef = 0;
@@ -385,6 +385,49 @@ Node* addKwordToken(Node* root, Token** token) {
         
         
     }
+    if (strcmp((*token)->vec->data, "void") == 0) {
+        Token* label = (*token)->next;
+        while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
+            if (label && (label->type == NAME || (label->type == KWORD &&  strcmp(label->vec->data, "main") == 0))
+                && label->next && (label->next->type == DELIMITER)) {
+                if (strcmp(label->next->vec->data, "(") == 0) {
+                    Function* newFunction = initFunction(label->vec->data, RETURN_INT);
+                    currentFunction = newFunction;
+
+                    addFunction(&currentFunctionList, newFunction);
+                    Node* newNode = createNode();
+                    newNode->token = *token;
+                    root->bottom = newNode;
+                    newNode->top = root;
+                    
+                    newNode->function = newFunction;
+                    
+                    label = label->next;
+                    while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ")") == 0)) {
+                        if (label->type == NAME) {
+                            Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1, 1);
+                            addParametrToFunction(newFunction, newVariable);
+                        }
+                        label = label->next;
+                    }
+                    if (label->type == DELIMITER && strcmp(label->vec->data, ")") == 0) {
+                        label = label->next;
+                    }
+                    (*token) = label;
+                    return newNode;
+                }
+            }
+            else {
+                printErrorMessage(13);
+                return NULL;
+            }
+        }
+        (*token) = (*token)->next;
+        return root;
+        
+        
+    }
+
     else if (strcmp((*token)->vec->data, "if") == 0) {
         Node* newNode = createNode();
         if (newNode == NULL) {
