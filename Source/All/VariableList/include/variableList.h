@@ -14,6 +14,6 @@ Variable* findVariable(VariableList* first, char* name);
 
 void deleteVariableList(VariableList* first);
 
-void addVariable(VariableList** first, Variable* variable);
+int addVariable(VariableList** first, Variable* variable);
 
 #endif //VARIABLELIST_H

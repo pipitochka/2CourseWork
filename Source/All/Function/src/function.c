@@ -25,13 +25,13 @@ void deleteFunction(Function *function) {
 }
 
 void addParametrToFunction(Function *function, Variable* variable) {
-    addVariable(&function->parameters, variable);
-    function->numVariables++;
+    function->numParameters = addVariable(&function->parameters, variable);
+    variable->counter = function->numParameters;
 }
 
 void addVariableToFunction(Function *function, Variable* variable) {
-    addVariable(&function->variables, variable);
-    function->numParameters++;
+    function->numVariables = addVariable(&function->variables, variable);
+    variable->counter = function->numVariables;
 }
 
 Variable* getVariableFromFunction(Function *function, char *name) {

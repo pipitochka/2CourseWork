@@ -131,7 +131,7 @@ void getToken(char* name, FILE* file, int down) {
     if (function) {
         top += function->numParameters + function->numVariables;
     }
-    top *= 12;
+    top *= 4;
     top += down;
     top += currentFunction->currentOffset;
     if (function != NULL) {
@@ -139,9 +139,9 @@ void getToken(char* name, FILE* file, int down) {
         q = findVariable(function->parameters, name);
         if (q != NULL) {
             int t = q->counter;
-            t *= 12;
+            t *= 4;
             top -= t;
-            fprintf(file, "addi a4, sp, %d\n", top-8);
+            fprintf(file, "addi a4, sp, %d\n", top + 4);
             fprintf(file, "lw a0, 0(a4)\n");
             fprintf(file, "mv a1, a4\n");
             fprintf(file, "lw a2, -8(a4)\n");
@@ -150,10 +150,10 @@ void getToken(char* name, FILE* file, int down) {
         q = findVariable(function->variables, name);
         if (q != NULL) {
             int t = q->counter;
-            t *= 12;
-            t += function->numParameters * 12;
+            t *= 4;
+            t += function->numParameters * 4;
             top -= t;
-            fprintf(file, "addi a4, sp, %d\n", top-8);
+            fprintf(file, "addi a4, sp, %d\n", top + 4);
             fprintf(file, "lw a0, 0(a4)\n");
             fprintf(file, "addi a4, a4, -4\n");
             fprintf(file, "mv a1, a4\n");
@@ -171,6 +171,10 @@ void getToken(char* name, FILE* file, int down) {
     printErrorMessage(17);
 }
 
+void prepareForMain(FILE* file, Function* function) {}
+
+void endMain(FILE* file, Function* function) {}
+
 void generate(Node* node, FILE* file) {
     if (node == NULL || file == NULL) {
         return;
@@ -180,6 +184,7 @@ void generate(Node* node, FILE* file) {
             fprintf(file, "%s:\n", node->function->name);
             if (strcmp(node->function->name, "main") == 0) {
                 isMainExist = 1;
+                prepareForMain(node, file);
             }
             fprintf(file, "addi sp, sp, -4\n");
             fprintf(file, "sw ra, 0(sp)\n");
@@ -209,9 +214,9 @@ void generate(Node* node, FILE* file) {
                 counter++;
             }
             Function * function = findFunction(currentFunctionList, node->token->vec->data);
-            fprintf(file, "addi sp, sp, %d\n", (function->numVariables) * -12);
+            fprintf(file, "addi sp, sp, %d\n", (function->numVariables) * -4);
             fprintf(file, "call %s\n", node->token->vec->data);
-            fprintf(file, "addi sp, sp, %d\n", (function->numParameters + function->numVariables) * 12);
+            fprintf(file, "addi sp, sp, %d\n", (function->numParameters + function->numVariables) * 4);
             node = node->bottom;
         }
         if (!(node->next &&

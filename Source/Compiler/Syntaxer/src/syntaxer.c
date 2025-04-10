@@ -84,9 +84,6 @@ Node* callFunction(Node* root, Token** token) {
                 newN->top = newRoot;
                 newRoot = newN;
             }
-            else {
-                printErrorMessage(14);
-            }
             *token = (*token)->next;
         }
         if (*token && strcmp((*token)->vec->data, ")") == 0) {
@@ -313,7 +310,7 @@ Node* addKwordToken(Node* root, Token** token) {
                                 addVariableToFunction(currentFunction, newVariable);
                             }
                         }
-                        label = label->next->next->next->next->next;
+                        label = label->next->next->next->next;
                             
                             }
                     else {
