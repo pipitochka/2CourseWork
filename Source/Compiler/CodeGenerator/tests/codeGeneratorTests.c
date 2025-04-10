@@ -18,7 +18,14 @@ void prepare(char* name, char* input, char* output) {
 
 
 int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
-  
+
+    Token* tokens = lexer(input);
+    Node* q = createAST(tokens);
+    generateCode(q, output);
+    freeNode(q);
+    deleteTokens(tokens);
+    
+    
     FILE* fileExpect = fopen(expected, "r");
     FILE* fileReal = fopen(output, "r");
     

@@ -77,12 +77,38 @@ Node* callFunction(Node* root, Token** token) {
     if (strcmp((*token)->vec->data, "(") == 0) {
         *token = (*token)->next;
         while (*token && !((*token)->vec && strcmp((*token)->vec->data, ")") == 0)) {
-            if ((*token)->type == NAME) {
+            if ((*token)->type == NAME || (*token)->type == NUMBER) {
                 newRoot->token = (*token);
                 Node* newN = createNode();
                 newRoot->bottom = newN;
                 newN->top = newRoot;
                 newRoot = newN;
+            }
+            else if ((*token)->type == BIN_OPERATOR || (*token)->type == UNAR_OPERATOR) {
+                if (strcmp((*token)->vec->data, "&") == 0) {
+                    newRoot->token = (*token);
+                    Node* newN;
+                    *token = (*token)->next;
+                    if ((*token)->type == NAME) {
+                        newN = createNode();
+                        newN->token = (*token);
+                        newN->prev = newRoot;
+                        newRoot -> next = newN;
+                    }
+                    else {
+                        printErrorMessage(19);
+                    }
+                    newN = createNode();
+                    newRoot->bottom = newN;
+                    newN->top = newRoot;
+                    newRoot = newN;
+                    
+                    
+                }
+                else {
+                    printErrorMessage(19);
+                }
+                
             }
             *token = (*token)->next;
         }
@@ -416,6 +442,23 @@ Node* addKwordToken(Node* root, Token** token) {
             }
         (*token)->vec->data[1] = ')';
         pushBackVector((*token)->vec, '\0');
+        return newNode;
+    }
+    else if (strcmp((*token)->vec->data, "return") == 0) {
+        Node* newNode = createNode();
+        if (newNode == NULL) {
+            return NULL;
+        }
+        newNode->top = root;
+        newNode->token = (*token);
+        root->bottom = newNode;
+        newNode->type = RETURN_NODE;
+        root = newNode;
+        newNode = createNode();
+        root->bottom = newNode;
+        newNode->top = root;
+        newNode->type = DATA_NODE;
+        (*token) = (*token)->next;
         return newNode;
     }
     return NULL;
