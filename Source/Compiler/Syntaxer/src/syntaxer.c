@@ -14,6 +14,7 @@ Function* currentFunction = NULL;
 
 FunctionList* currentFunctionList = NULL;
 
+
 void printAST(const Node* node) {
     if (node == NULL) {
         printf("printAST: NULL node, return\n");
@@ -127,20 +128,20 @@ Node* addOrdinaryToken(Node* root, Token** token) {
     if (token == NULL || *token == NULL || root == NULL) {
         return NULL;
     }
-    if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
-        return callFunction(root, token);        
-    }
     isLastOp = 0;
     Node* newNode = createNode();
     if (newNode == NULL) {
         return NULL;
     }
     newNode->token = *token;
-    *token = (*token)->next;
 
     if (root->type == DATA_NODE) {
         root->next = newNode;
         newNode->prev = root;
+        if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
+            callFunction(newNode, token);        
+        }
+        else{*token = (*token)->next;};
         return newNode;
     }
     
@@ -154,6 +155,12 @@ Node* addOrdinaryToken(Node* root, Token** token) {
         root->right->parent = newNode;
         root->right = newNode;
         newNode->parent = root;
+    }
+    if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
+        callFunction(newNode, token);        
+    }
+    else {
+        *token = (*token)->next;
     }
     return newNode;
 }
@@ -371,6 +378,9 @@ Node* addKwordToken(Node* root, Token** token) {
             }
         }
         (*token) = (*token)->next;
+        if ((*token) && strcmp((*token)->vec->data, "*") == 0) {
+            (*token) = (*token)->next;
+        }
         return root;
         
         
@@ -380,7 +390,7 @@ Node* addKwordToken(Node* root, Token** token) {
         if (newNode == NULL) {
             return NULL;
         }
-        newNode->parent = root;
+        newNode->top = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
@@ -398,7 +408,7 @@ Node* addKwordToken(Node* root, Token** token) {
         if (newNode == NULL) {
             return NULL;
         }
-        newNode->parent = root;
+        newNode->top = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
@@ -416,7 +426,7 @@ Node* addKwordToken(Node* root, Token** token) {
         if (newNode == NULL) {
             return NULL;
         }
-        newNode->parent = root;
+        newNode->top = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
@@ -431,7 +441,7 @@ Node* addKwordToken(Node* root, Token** token) {
     }
     else if (strcmp((*token)->vec->data, "for") == 0) {
         Node* newNode = createNode();
-        newNode->parent = root;
+        newNode->top = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
@@ -548,7 +558,10 @@ Node* addDelimetrToken(Node* root, Token** token) {
                     root = root->prev;
                 }
             }
-            return root;
+        while (root && root->bottom) {
+            root = root->bottom;
+        }
+        return root;
         }
     else if (strcmp((*token)->vec->data, "]") == 0) {
             isLastOp = 0;

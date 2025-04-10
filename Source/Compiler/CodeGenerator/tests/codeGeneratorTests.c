@@ -25,7 +25,6 @@ int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
     freeNode(q);
     deleteTokens(tokens);
     
-    
     FILE* fileExpect = fopen(expected, "r");
     FILE* fileReal = fopen(output, "r");
     
@@ -41,7 +40,7 @@ int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
     }
     fclose(fileReal);
     fclose(fileExpect);
-    printf("Test success");
+    printf("Test %s success\n", name);
     return 1;
    
 }
@@ -50,4 +49,18 @@ int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
 int main() {    
     codeGeneratorTest("1 TEST", "../../Source/Compiler/CodeGenerator/tests/1.in", "../../Source/Compiler/CodeGenerator/tests/1.out", 
                     "../../Source/Compiler/CodeGenerator/tests/1.expect");
+    codeGeneratorTest("2 TEST", "../../Source/Compiler/CodeGenerator/tests/2.in", "../../Source/Compiler/CodeGenerator/tests/2.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/2.expect");
+    codeGeneratorTest("3 TEST", "../../Source/Compiler/CodeGenerator/tests/3.in", "../../Source/Compiler/CodeGenerator/tests/3.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/3.expect");
+    codeGeneratorTest("4 TEST", "../../Source/Compiler/CodeGenerator/tests/4.in", "../../Source/Compiler/CodeGenerator/tests/4.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/4.expect");
+    codeGeneratorTest("5 TEST", "../../Source/Compiler/CodeGenerator/tests/5.in", "../../Source/Compiler/CodeGenerator/tests/5.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/5.expect");
+    codeGeneratorTest("6 TEST", "../../Source/Compiler/CodeGenerator/tests/6.in", "../../Source/Compiler/CodeGenerator/tests/6.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/6.expect");
+    codeGeneratorTest("7 TEST", "../../Source/Compiler/CodeGenerator/tests/7.in", "../../Source/Compiler/CodeGenerator/tests/7.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/7.expect");
+    codeGeneratorTest("8 TEST", "../../Source/Compiler/CodeGenerator/tests/8.in", "../../Source/Compiler/CodeGenerator/tests/8.out", 
+                    "../../Source/Compiler/CodeGenerator/tests/8.expect");
 }

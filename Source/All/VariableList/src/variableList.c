@@ -46,8 +46,8 @@ int addVariable(VariableList** first, Variable* variable) {
             return 3;
         }
         if (variable->type == MAS) {
-            (*first)->counter = variable->nums + 2;
-            return variable->nums + 2;
+            (*first)->counter = variable->nums + 3;
+            return variable->nums + 3;
         }
     }
     VariableList* current = *first;
@@ -62,8 +62,8 @@ int addVariable(VariableList** first, Variable* variable) {
         return current->counter + 3;
     }
     if (variable->type == MAS) {
-        newVariableList->counter = current->counter + variable->nums + 2;
-        return current->counter + variable->nums + 2;
+        newVariableList->counter = current->counter + variable->nums + 3;
+        return current->counter + variable->nums + 3;
     }
     
 }

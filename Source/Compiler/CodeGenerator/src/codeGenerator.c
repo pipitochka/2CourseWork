@@ -178,11 +178,17 @@ void endMain(FILE* file, Function* function) {}
 
 void printLocalVariables(FILE* file, Function* function) {
     VariableList* variables = function->variables;
+    int counter = 0;
     while (variables != NULL) {
-        fprintf(file, "addi sp, sp, %d\n", -1 * variables->counter * 4);
+        fprintf(file, "addi sp, sp, %d\n", -1 * (variables->counter - counter) * 4);
+        counter = variables->counter;
         fprintf(file, "addi a4, sp, 4\n");
         fprintf(file, "addi a5, sp, 8\n");
         fprintf(file, "sw a5, 0(a4)\n");
+        if (variables->variable->type == MAS) {
+            fprintf(file, "addi a6, sp, 12\n");
+            fprintf(file, "sw a6, 4(a4)\n");
+        }
         fprintf(file, "li a5, %d\n", variables->variable->size);
         fprintf(file, "sw a5, -4(a4)\n");
         variables = variables->next;
@@ -194,7 +200,7 @@ void generate(Node* node, FILE* file) {
         return;
     }
     if (node != NULL) {
-        if (node->function != NULL) {
+        if (node && node->function != NULL) {
             fprintf(file, "%s:\n", node->function->name);
             currentFunction = node->function;
             if (strcmp(node->function->name, "main") == 0) {
@@ -219,7 +225,7 @@ void generate(Node* node, FILE* file) {
                 node = node->bottom;
             }
         }
-        if (node->type == FUNCTION_CALL) {
+        if (node && node->type == FUNCTION_CALL) {
             Node* q = node->next;
             int counter = 0;
             while (q && q->token) {
@@ -238,9 +244,10 @@ void generate(Node* node, FILE* file) {
                 else if (q->token->type == NUMBER) {
                     fprintf(file, "li a0, %s\n", q->token->vec->data);
                     fprintf(file, "li a1, 0\n");
-                    fprintf(file, "li a2, 0\n");
+                    fprintf(file, "li a2, 4\n");
                     fprintf(file, "addi sp, sp, -4\n");
                     fprintf(file, "sw a0, 0(sp)\n");
+                    fprintf(file, "mv a1, sp\n");
                     fprintf(file, "addi sp, sp, -4\n");
                     fprintf(file, "sw a1, 0(sp)\n");
                     fprintf(file, "addi sp, sp, -4\n");
@@ -252,7 +259,9 @@ void generate(Node* node, FILE* file) {
                     if (strcmp(q->token->vec->data, "&") == 0 && q->next && q->next->token->type == NAME) {
                         getToken(q->next->token->vec->data, file, counter);
                         fprintf(file, "addi sp, sp, -4\n");
+                        fprintf(file, "mv a0, a1\n");
                         fprintf(file, "sw a0, 0(sp)\n");
+                        fprintf(file, "mv a1, sp\n");
                         fprintf(file, "addi sp, sp, -4\n");
                         fprintf(file, "sw a1, 0(sp)\n");
                         fprintf(file, "addi sp, sp, -4\n");
@@ -275,14 +284,17 @@ void generate(Node* node, FILE* file) {
             fprintf(file, "addi sp, sp, %d\n", (function->numParameters + function->numVariables) * 4);
             node = node->bottom;
         }
-        if (!(node->next &&
+        if (node && !(node->next &&
             (node->next->token->type == NUMBER
                 || node->next->token->type == STRING
                 || node->next->token->type == NAME
                 || (node->next->token->type == BIN_OPERATOR && strcmp(node->next->token->vec->data, "[") == 0)))) {
             generate(node->next, file);
         }
-        if (node->token && (node->token->type == BIN_OPERATOR || node->token->type == UNAR_OPERATOR)) {
+        if (node && node->next && node->next->token->type == NAME && node->next->bottom && node->next->bottom->type == FUNCTION_CALL) {
+            generate(node->next->bottom, file);
+        }
+        if (node && node->token && (node->token->type == BIN_OPERATOR || node->token->type == UNAR_OPERATOR)) {
             fprintf(file, "# start OP\n");
             generate(node->right, file);
             if (node->right) {
@@ -342,7 +354,7 @@ void generate(Node* node, FILE* file) {
                     break;
                 }
                 case 7: {
-                    fprintf(file, "div a0, a0, a3\n");
+                    fprintf(file, "sub a0, a0, a3\n");
                     fprintf(file, "sw a0, 0(a1)\n");
                     fprintf(file, "\n");
                     break;
@@ -376,16 +388,16 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 0\n");
                     fprintf(file, "j loop%d\n", counter+2);
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+2);
+                    fprintf(file, "loop%d:\n", counter+2);
                     fprintf(file, "\n");
                     counter += 3;
                     break;
@@ -395,17 +407,17 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "bne a3, x0, loop%d\n", counter+1);
                     fprintf(file, "li a0 0\n");
                     fprintf(file, "j loop%d\n", counter+2);
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+2);
+                    fprintf(file, "loop%d:\n", counter+2);
                     fprintf(file, "\n");
                     counter += 3;
 
@@ -423,11 +435,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -440,11 +452,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -457,11 +469,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 0\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -474,11 +486,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -491,11 +503,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -508,11 +520,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -525,11 +537,11 @@ void generate(Node* node, FILE* file) {
                     fprintf(file, "j loop%d\n", counter+1);
                     fprintf(file, "\n");
                     
-                    fprintf(file, ".loop%d\n", counter);
+                    fprintf(file, "loop%d:\n", counter);
                     fprintf(file, "li a0 1\n");
                     fprintf(file, "\n");
 
-                    fprintf(file, ".loop%d\n", counter+1);
+                    fprintf(file, "loop%d:\n", counter+1);
                     fprintf(file, "\n");
                     
                     counter += 2;
@@ -632,7 +644,7 @@ void generate(Node* node, FILE* file) {
                 }
                 case 35: {
                     fprintf(file, "mul a6, a2, a3\n");
-                    fprintf(file, "add a1, a1, a6\n");
+                    fprintf(file, "add a1, a0, a6\n");
                     fprintf(file, "lw a0, 0(a1)\n");
                     break;
                 }
@@ -640,34 +652,39 @@ void generate(Node* node, FILE* file) {
             fprintf(file, "# end OP\n");
 
         }
-        else if (node->left == NULL && node->right == NULL && node->token && node->token->type == NAME
+        else if (node && node->left == NULL && node->right == NULL && node->token && node->token->type == NAME
             && node->generated == 0) {
-            getToken(node->token->vec->data, file, 0);
+            if (findFunction(currentFunctionList,node->token->vec->data) == NULL) {
+                getToken(node->token->vec->data, file, 0);
+            }
+            else {
+                generate(node->bottom, file);
+            }
         }
-        else if (node->left == NULL && node->right == NULL && node->token && node->token->type == NUMBER
+        else if (node && node->left == NULL && node->right == NULL && node->token && node->token->type == NUMBER
             && node->generated == 0) {
             fprintf(file, "li a0, %s\n", node->token->vec->data);
             fprintf(file, "li a1, 0\n");
             fprintf(file, "li a2, 0\n");
             }
-        else if (node->token && node->token->type == DELIMITER && strcmp(node->token->vec->data, "(") == 0) {
+        else if (node && node->token && node->token->type == DELIMITER && strcmp(node->token->vec->data, "(") == 0) {
             if (node->right) {
                 generate(node->right, file);
             }
         }
-        else if (node->token && node->token->type == DELIMITER && strcmp(node->token->vec->data, "[") == 0) {
+        else if (node && node->token && node->token->type == DELIMITER && strcmp(node->token->vec->data, "[") == 0) {
             if (node->right) {
                 generate(node->right, file);
             }
         }
-        else if (node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "if") == 0) {
+        else if (node && node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "if") == 0) {
             if (node->bottom || node->bottom->token && node->bottom->token->type == DELIMITER
                 && strcmp(node->bottom->token->vec->data, "()") == 0) {
                 node = node->bottom;
                 generate(node->next, file);
                 int t = counter;
                 counter += 2;
-                fprintf(file, "beq a0, x0, .loop%d\n", t);
+                fprintf(file, "beq a0, x0, loop%d\n", t);
 
                 node = node->bottom;
                 if (node && node->next && node->next->token && node->next->token->type == SCOPE_OPEN) {
@@ -678,9 +695,9 @@ void generate(Node* node, FILE* file) {
                     return;
                 }
                 
-                fprintf(file, "j .loop%d\n", t+1);
+                fprintf(file, "j loop%d\n", t+1);
 
-                fprintf(file, ".loop%d\n", t);
+                fprintf(file, "loop%d:\n", t);
                 node = node->bottom;
                 if (node && node->bottom && node->bottom->token
                     && node->bottom->token->type == KWORD && strcmp(node->bottom->token->vec->data, "else") == 0) {
@@ -697,17 +714,17 @@ void generate(Node* node, FILE* file) {
                 
                 
 
-                fprintf(file, ".loop%d\n", t + 1);
+                fprintf(file, "loop%d:\n", t + 1);
             }
             else {
                 printErrorMessage(15);
                 return;
             }
         }
-        else if (node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "while") == 0) {
+        else if (node && node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "while") == 0) {
             int t = counter;
             counter += 2;
-            fprintf(file, ".loop%d\n", t);
+            fprintf(file, "loop%d:\n", t);
 
             if (node->bottom || node->bottom->token && node->bottom->token->type == DELIMITER
                 && strcmp(node->bottom->token->vec->data, "()") == 0) {
@@ -718,7 +735,7 @@ void generate(Node* node, FILE* file) {
                 printErrorMessage(16);
                 return;
             }
-            fprintf(file, "beq a0, x0, .loop%d\n", t + 1);
+            fprintf(file, "beq a0, x0, loop%d\n", t + 1);
 
             node = node->bottom;
             if (node && node->next && node->next->token && node->next->token->type == SCOPE_OPEN) {
@@ -729,37 +746,47 @@ void generate(Node* node, FILE* file) {
                 return;
             }
             
-            fprintf(file, "j .loop%d\n", t);
-            fprintf(file, ".loop%d\n", t+1);
+            fprintf(file, "j loop%d\n", t);
+            fprintf(file, "loop%d:\n", t+1);
 
             
         }
-        else if (node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "for") == 0) {
+        else if (node && node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "for") == 0) {
             int t = counter;
             counter += 2;
             if (node && node->bottom && node->bottom->bottom && node->bottom->bottom->bottom) {
                 node = node->bottom;
 
                 generate(node->next, file);
-                fprintf(file, ".loop%d\n", t);
+                fprintf(file, "loop%d:\n", t);
                 node = node->bottom;
                 
                 generate(node->next, file);
 
-                fprintf(file, "beq a0, x0, .loop%d\n", t + 1);
+                fprintf(file, "beq a0, x0, loop%d\n", t + 1);
                 node = node->bottom;
                 generate(node->bottom->next, file);
                 generate(node->next, file);
                 node = node->bottom;
                 
-                fprintf(file, "j .loop%d\n", t);
-                fprintf(file, ".loop%d\n", t+1);
+                fprintf(file, "j loop%d\n", t);
+                fprintf(file, "loop%d:\n", t+1);
             }
             else {
                 printErrorMessage(17);
             }
         }
-        generate(node->bottom, file);
+        else if (node && node->token && node->token->type == KWORD && strcmp(node->token->vec->data, "return") == 0) {
+            generate(node->bottom, file);
+            fprintf(file, "lw ra, 0(sp)\n");
+            fprintf(file, "addi sp, sp, 4\n");
+            fprintf(file, "ret\n");
+            node = node->bottom->bottom;
+        }
+
+        if (node) {
+            generate(node->bottom, file);
+        }
     }
 }
 
@@ -777,4 +804,8 @@ void generateCode(Node* code, char* fileName) {
     }
     endOfFile(file);
     fclose(file);
+    deleteFunctionList(currentFunctionList);
+    deleteVariableList(globalVariables);
+    currentFunctionList = NULL;
+    globalVariables = NULL;
 }
