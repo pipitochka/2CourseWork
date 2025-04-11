@@ -47,20 +47,20 @@ int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
 
 
 int main() {    
-    codeGeneratorTest("1 TEST", "../../Source/Compiler/CodeGenerator/tests/1.in", "../../Source/Compiler/CodeGenerator/tests/1.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/1.expect");
-    codeGeneratorTest("2 TEST", "../../Source/Compiler/CodeGenerator/tests/2.in", "../../Source/Compiler/CodeGenerator/tests/2.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/2.expect");
-    codeGeneratorTest("3 TEST", "../../Source/Compiler/CodeGenerator/tests/3.in", "../../Source/Compiler/CodeGenerator/tests/3.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/3.expect");
-    codeGeneratorTest("4 TEST", "../../Source/Compiler/CodeGenerator/tests/4.in", "../../Source/Compiler/CodeGenerator/tests/4.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/4.expect");
-    codeGeneratorTest("5 TEST", "../../Source/Compiler/CodeGenerator/tests/5.in", "../../Source/Compiler/CodeGenerator/tests/5.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/5.expect");
-    codeGeneratorTest("6 TEST", "../../Source/Compiler/CodeGenerator/tests/6.in", "../../Source/Compiler/CodeGenerator/tests/6.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/6.expect");
-    codeGeneratorTest("7 TEST", "../../Source/Compiler/CodeGenerator/tests/7.in", "../../Source/Compiler/CodeGenerator/tests/7.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/7.expect");
-    codeGeneratorTest("8 TEST", "../../Source/Compiler/CodeGenerator/tests/8.in", "../../Source/Compiler/CodeGenerator/tests/8.out", 
-                    "../../Source/Compiler/CodeGenerator/tests/8.expect");
+    codeGeneratorTest("1 TEST", "../../Source/Compiler/CodeGenerator/tests/1.c", "../../Source/Compiler/CodeGenerator/tests/1_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/1_expect.s");
+    codeGeneratorTest("2 TEST", "../../Source/Compiler/CodeGenerator/tests/2.c", "../../Source/Compiler/CodeGenerator/tests/2_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/2_expect.s");
+    codeGeneratorTest("3 TEST", "../../Source/Compiler/CodeGenerator/tests/3.c", "../../Source/Compiler/CodeGenerator/tests/3_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/3_expect.s");
+    codeGeneratorTest("4 TEST", "../../Source/Compiler/CodeGenerator/tests/4.c", "../../Source/Compiler/CodeGenerator/tests/4_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/4_expect.s");
+    codeGeneratorTest("5 TEST", "../../Source/Compiler/CodeGenerator/tests/5.c", "../../Source/Compiler/CodeGenerator/tests/5_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/5_expect.s");
+    codeGeneratorTest("6 TEST", "../../Source/Compiler/CodeGenerator/tests/6.c", "../../Source/Compiler/CodeGenerator/tests/6_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/6_expect.s");
+    codeGeneratorTest("7 TEST", "../../Source/Compiler/CodeGenerator/tests/7.c", "../../Source/Compiler/CodeGenerator/tests/7_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/7_expect.s");
+    codeGeneratorTest("8 TEST", "../../Source/Compiler/CodeGenerator/tests/8.c", "../../Source/Compiler/CodeGenerator/tests/8_out.s", 
+                    "../../Source/Compiler/CodeGenerator/tests/8_expect.s");
 }
