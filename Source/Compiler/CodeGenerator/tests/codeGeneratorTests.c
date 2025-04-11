@@ -47,20 +47,20 @@ int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
 
 
 int main() {    
-    codeGeneratorTest("1 TEST", "../../Source/Compiler/CodeGenerator/tests/1.c", "../../Source/Compiler/CodeGenerator/tests/1_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/1_expect.s");
-    codeGeneratorTest("2 TEST", "../../Source/Compiler/CodeGenerator/tests/2.c", "../../Source/Compiler/CodeGenerator/tests/2_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/2_expect.s");
-    codeGeneratorTest("3 TEST", "../../Source/Compiler/CodeGenerator/tests/3.c", "../../Source/Compiler/CodeGenerator/tests/3_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/3_expect.s");
-    codeGeneratorTest("4 TEST", "../../Source/Compiler/CodeGenerator/tests/4.c", "../../Source/Compiler/CodeGenerator/tests/4_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/4_expect.s");
-    codeGeneratorTest("5 TEST", "../../Source/Compiler/CodeGenerator/tests/5.c", "../../Source/Compiler/CodeGenerator/tests/5_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/5_expect.s");
-    codeGeneratorTest("6 TEST", "../../Source/Compiler/CodeGenerator/tests/6.c", "../../Source/Compiler/CodeGenerator/tests/6_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/6_expect.s");
-    codeGeneratorTest("7 TEST", "../../Source/Compiler/CodeGenerator/tests/7.c", "../../Source/Compiler/CodeGenerator/tests/7_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/7_expect.s");
-    codeGeneratorTest("8 TEST", "../../Source/Compiler/CodeGenerator/tests/8.c", "../../Source/Compiler/CodeGenerator/tests/8_out.s", 
-                    "../../Source/Compiler/CodeGenerator/tests/8_expect.s");
+    codeGeneratorTest("1 TEST", "../../Tests/in/1.c", "../../Tests/out/1_out.s", 
+                    "../../Tests/expected/1_expect.s");
+    codeGeneratorTest("2 TEST", "../../Tests/in/2.c", "../../Tests/out/2_out.s", 
+                    "../../Tests/expected/2_expect.s");
+    codeGeneratorTest("3 TEST", "../../Tests/in/3.c", "../../Tests/out/3_out.s", 
+                    "../../Tests/expected/3_expect.s");
+    codeGeneratorTest("4 TEST", "../../Tests/in/4.c", "../../Tests/out/4_out.s", 
+                    "../../Tests/expected/4_expect.s");
+    codeGeneratorTest("5 TEST", "../../Tests/in/5.c", "../../Tests/out/5_out.s", 
+                    "../../Tests/expected/5_expect.s");
+    codeGeneratorTest("6 TEST", "../../Tests/in/6.c", "../../Tests/out/6_out.s", 
+                    "../../Tests/expected/6_expect.s");
+    codeGeneratorTest("7 TEST", "../../Tests/in/7.c", "../../Tests/out/7_out.s", 
+                    "../../Tests/expected/7_expect.s");
+    codeGeneratorTest("8 TEST", "../../Tests/in/8.c", "../../Tests/out/8_out.s", 
+                    "../../Tests/expected/8_expect.s");
 }
