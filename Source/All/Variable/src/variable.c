@@ -5,6 +5,10 @@
 
 #include "../../../Safe/Error/include/error.h"
 
+//function to allocate memory for variable
+//makes others field 0 or NULL
+//if allocation can not be done return NULL
+//return point to new Variable
 Variable* initVariable(char* name, int size, enum Type type, int nums, int isRef) {
     Variable* triple = (Variable*)malloc(sizeof(Variable));
     if (triple == NULL) {
@@ -20,6 +24,8 @@ Variable* initVariable(char* name, int size, enum Type type, int nums, int isRef
     return triple;
 }
 
+//function to deallocate memory for variable
+//don't deallocate memory for name
 void deleteVariable(Variable* first) {
     free(first);
 }

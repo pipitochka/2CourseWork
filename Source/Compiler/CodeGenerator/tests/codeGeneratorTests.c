@@ -4,27 +4,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void prepare(char* name, char* input, char* output) {
-    Token* tokens = lexer(input);
-    Node* q = createAST(tokens);
-    
-    //generateCode(q, output, getTriple());
-    generateCode(q, output);
-
-    
-    deleteTokens(tokens);
-    freeNode(q);
-}
-
-
 int codeGeneratorTest(char* name, char* input, char* output, char* expected) {
 
+    //generate assembly code from input file
     Token* tokens = lexer(input);
     Node* q = createAST(tokens);
     generateCode(q, output);
     freeNode(q);
     deleteTokens(tokens);
-    
+
+    //compare expected code and right code
     FILE* fileExpect = fopen(expected, "r");
     FILE* fileReal = fopen(output, "r");
     

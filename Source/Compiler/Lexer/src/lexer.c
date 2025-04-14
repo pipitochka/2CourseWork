@@ -6,10 +6,11 @@
 #include "../../../Safe/Error/include/error.h"
 
 
-
+//function to make token list from file 
 Token* lexer(char* name) {
     FILE* file;
 
+    //opening file
     Token* token = initToken(); ;
     Token* first = token;
     token->next = NULL;
@@ -21,6 +22,7 @@ Token* lexer(char* name) {
 
     enum States state = NONE_STATE;
 
+    //switch by value of symbol
     char c = fgetc(file);
     while (!feof(file)) {
         switch (state) {
@@ -28,30 +30,37 @@ Token* lexer(char* name) {
                 while (c == ' ' || c == '\t' || c == '\n') {
                     c = getc(file);
                 }
+                //number
                 if (c >= '0' && c <= '9') {
                     state = NUMBER_STATE;
                     break;
                 }
+                //word
                 if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
                     state = WORD_STATE;
                     break;
                 }
+                //string
                 if (c == '\"') {
                     state = STRING_STATE;
                     break;
                 }
+                //char
                 if (c == '\'') {
                     state = CHAR_STATE;
                     break;
                 }
+                //scope
                 if (c == '}' || c == '{') {
                     state = SCOPE_STATE;
                     break;
                 }
+                //decimeters
                 if (c == ')' || c == '(' || c == ',' || c == ';' || c == ']' || c == ':') {
                     state = DELIMITER_STATE;
                     break;
                 }
+                //operators
                 if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '=' || c == '<' || c == '>'
                     || c == '&' || c == '|' || c == '!' || c == '~' || c == '^' || c == '[') {
                     state = OPERATOR_STATE;

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//errors
 const char* errors[] = {
     "error: unterminated string\n",  // 0
     "error: unterminated character\n",  // 1
@@ -29,7 +30,7 @@ const char* errors[] = {
 };
 
 
-
+//function to print error messages
 void printErrorMessage(const int errorCode) {
     if (errors[errorCode] == NULL) {
         exit(-1);

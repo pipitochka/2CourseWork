@@ -3,7 +3,7 @@
 #include "../../../All/Node/include/node.h"
 #include "../../../All/FunctionList/include/functionList.h"
 
-
+//main function to generate code
 void generateCode(Node* code, char* filename);
 
 #endif //CODEGENERATOR_H

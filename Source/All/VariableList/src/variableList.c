@@ -5,6 +5,8 @@
 
 #include "../../../Safe/Error/include/error.h"
 
+//function to allocate memory for variableList
+//if alloctaion can not be done return NULL
 VariableList* initVariableList() {
     VariableList* variableList = (VariableList*)malloc(sizeof(VariableList));
     if (variableList == NULL) {
@@ -14,7 +16,8 @@ VariableList* initVariableList() {
     return variableList;
 }
 
-
+//function to find variable in variableList by name
+//return point to founded variable or NULL if there is no variable inside variableList
 Variable* findVariable(VariableList* first, char* name) {
     if (first != NULL) {
         if (first->variable != NULL && first->variable->name != NULL) {
@@ -27,6 +30,9 @@ Variable* findVariable(VariableList* first, char* name) {
     return NULL;
 }
 
+//function to deallocate memory for variableList
+//recursively deallocate memory for all objects
+//also deallocate memory for variable
 void deleteVariableList(VariableList* first) {
     if (first != NULL) {
         deleteVariableList(first->next);
@@ -37,6 +43,9 @@ void deleteVariableList(VariableList* first) {
     }
 }
 
+//function to add variable into variableList
+//also recalculate offset of stack and return it
+//offset depend on type of variable and size of massive if it is a pointer
 int addVariable(VariableList** first, Variable* variable) {
     if (*first == NULL) {
         (*first) = initVariableList();

@@ -4,12 +4,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
+//function to compare vector
 int compareVectors(const Vector *a, const Vector *b, Token *token) {
     int t = 0;
+    
+    //check size and exists of vector
     if (safeAssert((a == NULL || b == NULL) || (a->size == b->size), token) == 0) {
         return 0;
     }
+    
+    //check symbols
     while (t < a->size && t < b->size) {
         if (safeAssert(a->data[t] == b->data[t], token) == 0) {
             return 0;
@@ -20,6 +24,7 @@ int compareVectors(const Vector *a, const Vector *b, Token *token) {
 }
 
 int lexerTest(char* name, char* input, char* expected) {
+    //make token list from file
     Token* token = lexer(input);
     Token* first = token;
     safeAssert(token != NULL, token);
@@ -27,7 +32,7 @@ int lexerTest(char* name, char* input, char* expected) {
         return 0;
     }
     
-    //printTokens(token);
+    //compare result and right list
     FILE* file = fopen(expected, "r");
 
     char c = fgetc(file);

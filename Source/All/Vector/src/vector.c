@@ -6,6 +6,9 @@
 #include "../../../Safe/Error/include/error.h"
 
 //allocate memory for vector
+//return point to allocated vector or null if allocation cannot be competed
+//makes fields size = 0(used memory) and capacity = 1(allocated memory)
+//allocate memory for massive
 Vector* initVector() {
     Vector* vec = (Vector*)malloc(sizeof(Vector));
     if (vec == NULL) {
@@ -22,7 +25,7 @@ Vector* initVector() {
     return vec;
 }
 
-
+//deallocate memory for vector
 void freeVector(Vector* vec) {
     if (vec != NULL) {
         free(vec->data);  
@@ -31,6 +34,7 @@ void freeVector(Vector* vec) {
 }
 
 //add element in the end of vector
+//if size > capacity reallocate memory and makes buffer bigger two times 
 void pushBackVector(Vector* vec, const char q) {
     if (vec->size >= vec->capacity) {
         vec->capacity *= 2;

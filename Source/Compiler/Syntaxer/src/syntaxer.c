@@ -4,17 +4,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+//global variable to control correct ()
 int depth = 0;
 
+//for checking unar operator
 int isLastOp = 1;
 
+//global variable list for global variables
 VariableList* globalVariables = NULL;
 
+//global current function
 Function* currentFunction = NULL;
 
+//global function list 
 FunctionList* currentFunctionList = NULL;
 
-
+//additional funtion to print AST
 void printAST(const Node* node) {
     if (node == NULL) {
         printf("printAST: NULL node, return\n");
@@ -48,10 +53,13 @@ void printAST(const Node* node) {
     }
 }
 
+//function for Inculde token
+//not done
 Node* addIncludeToken(Node* root, Token** token) {
     return NULL;
 }
 
+//function to make Node for function call
 Node* callFunction(Node* root, Token** token) {
     if (token == NULL || *token == NULL || root == NULL) {
         return NULL;
@@ -59,10 +67,14 @@ Node* callFunction(Node* root, Token** token) {
     if (*(token) == NULL) {
         return NULL;
     }
+    
+    //find function in function list
     Function* function = findFunction(currentFunctionList, (*token)->vec->data);
     if (function == NULL) {
         return NULL;
     }
+
+    //make a new Node
     Node* newNode = createNode();
     if (newNode == NULL) {
         return NULL;
@@ -75,9 +87,13 @@ Node* callFunction(Node* root, Token** token) {
     Node* newRoot = createNode();
     newRoot->prev = newNode;
     newNode->next = newRoot;
+    
     if (strcmp((*token)->vec->data, "(") == 0) {
         *token = (*token)->next;
+        
+        //add parameters which used to function call
         while (*token && !((*token)->vec && strcmp((*token)->vec->data, ")") == 0)) {
+            //add name or number
             if ((*token)->type == NAME || (*token)->type == NUMBER) {
                 newRoot->token = (*token);
                 Node* newN = createNode();
@@ -85,6 +101,7 @@ Node* callFunction(Node* root, Token** token) {
                 newN->top = newRoot;
                 newRoot = newN;
             }
+            //add reference on a variable
             else if ((*token)->type == BIN_OPERATOR || (*token)->type == UNAR_OPERATOR) {
                 if (strcmp((*token)->vec->data, "&") == 0) {
                     newRoot->token = (*token);
@@ -113,17 +130,20 @@ Node* callFunction(Node* root, Token** token) {
             }
             *token = (*token)->next;
         }
+        //check if function call ends correctly
         if (*token && strcmp((*token)->vec->data, ")") == 0) {
             *token = (*token)->next;;
         }    
         return newNode;
     }
     else {
+        //in case of error
         printErrorMessage(13);
     }
     return NULL;
 }
 
+//function to add number, variables
 Node* addOrdinaryToken(Node* root, Token** token) {
     if (token == NULL || *token == NULL || root == NULL) {
         return NULL;
@@ -135,27 +155,34 @@ Node* addOrdinaryToken(Node* root, Token** token) {
     }
     newNode->token = *token;
 
+    //check if it is start of block
     if (root->type == DATA_NODE) {
         root->next = newNode;
         newNode->prev = root;
+
+        //check if it is function name
         if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
             callFunction(newNode, token);        
         }
         else{*token = (*token)->next;};
         return newNode;
     }
-    
+
+    //add to the right son of Node
     if (root->right == NULL) {
         root->right = newNode;
         newNode->parent = root;
     }
-    
+
+    //if right are used we add to the left
     else {
         newNode->left = root->right;
         root->right->parent = newNode;
         root->right = newNode;
         newNode->parent = root;
     }
+    
+    //function call
     if (findFunction(currentFunctionList, (*token)->vec->data) != NULL) {
         callFunction(newNode, token);        
     }
@@ -165,6 +192,7 @@ Node* addOrdinaryToken(Node* root, Token** token) {
     return newNode;
 }
 
+//add operator
 Node* addOperatorToken(Node* root, Token** token) {
     if (token == NULL || *token == NULL || root == NULL) {
         return NULL;
@@ -174,7 +202,8 @@ Node* addOperatorToken(Node* root, Token** token) {
         return NULL;
     }
     newNode->token = *token;
-    
+
+    //for unar operator
     if (isLastOp && (*token)->type == BIN_OPERATOR) {
         isLastOp = 1;
         if (token && *token && (*token)->vec && (
@@ -193,7 +222,7 @@ Node* addOperatorToken(Node* root, Token** token) {
         isLastOp = 1;
     }
 
-    
+    //changing tree for correct AST 
     while (root && root->parent != NULL  &&
         ((root->parent->token != NULL
             && (root->parent->token->type == BIN_OPERATOR || root->parent->token->type == UNAR_OPERATOR)
@@ -201,7 +230,8 @@ Node* addOperatorToken(Node* root, Token** token) {
             || (root->parent->type == SCOPE)))  {
         root = root->parent;
     }
-    
+
+    //unar operator situation 
     if ((*token)->type == UNAR_OPERATOR) {
         *token = (*token)->next;
         if (root && root->type == DATA_NODE) {
@@ -209,13 +239,15 @@ Node* addOperatorToken(Node* root, Token** token) {
             newNode->prev = root;
             return newNode;
         }
-        
+
+        //add to the left if it is free
         if (root && root->left == NULL) {
             root->left = newNode;
             newNode->parent = root;
             return newNode;
         }
         else {
+            //add to the right
             if (root == NULL) {
                 return NULL;
             }
@@ -224,10 +256,15 @@ Node* addOperatorToken(Node* root, Token** token) {
             return newNode;
         }
     }
-    
+
+    //binar operator situation
     *token = (*token)->next;
+    
+    //if it is root of tree
     if (root && root->parent != NULL) {
         newNode->left = root;
+        
+        //change previous Node
         if (root == root->parent->right) {
             root->parent->right = newNode;
         }
@@ -255,22 +292,31 @@ Node* addOperatorToken(Node* root, Token** token) {
     return NULL;
 }
 
+//for keyword scope
 Node* addKwordToken(Node* root, Token** token) {
     if (token == NULL || *token == NULL || root == NULL) {
         return NULL;
     }
+    
+    //new variable, massive or function
     if (strcmp((*token)->vec->data, "int") == 0 || strcmp((*token)->vec->data, "char") == 0) {
         Token* label = (*token)->next;
-        //указатели
+        
+        //pointer case
         int isRef = 0;
         if (label && strcmp(label->vec->data, "*") == 0) {
             label = label->next;
             isRef = 1;
         }
+
+        //checking all variables
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
+
+            //variable, function or pointer
             if (label && (label->type == NAME || (label->type == KWORD &&  strcmp(label->vec->data, "main") == 0))
                 && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, ",") == 0 || strcmp(label->next->vec->data, ";") == 0) {
+                    //add new variable if there is no such variables in the function scope
                     if (findVariable(globalVariables, label->next->vec->data) != NULL) {
                         printErrorMessage(18);
                     }
@@ -289,7 +335,9 @@ Node* addKwordToken(Node* root, Token** token) {
                     label = label->next->next;
                     
                 }
+                //function situation
                 else if (strcmp(label->next->vec->data, "(") == 0) {
+                    //add function to function list
                     Function* newFunction = initFunction(label->vec->data, RETURN_INT);
                     currentFunction = newFunction;
 
@@ -300,7 +348,8 @@ Node* addKwordToken(Node* root, Token** token) {
                     newNode->top = root;
                     
                     newNode->function = newFunction;
-                    
+
+                    //add parameters for function
                     label = label->next;
                     while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ")") == 0)) {
                         if (label->type == NAME) {
@@ -317,6 +366,8 @@ Node* addKwordToken(Node* root, Token** token) {
                 }
                 
             }
+
+            //massive situation
             else if (label && label->type == NAME && label->next && (label->next->type == BIN_OPERATOR)) {
                 if (strcmp(label->next->vec->data, "[") == 0) {
                     if (isRef) {
@@ -335,6 +386,7 @@ Node* addKwordToken(Node* root, Token** token) {
                             printErrorMessage(18);
                         }
                         else {
+                            //add variable to function variables
                             Variable* newVariable = initVariable(label->vec->data, 4, MAS, counter, 1);
                             if (currentFunction == NULL) {
                                 addVariable(&globalVariables, newVariable);
@@ -385,12 +437,15 @@ Node* addKwordToken(Node* root, Token** token) {
         
         
     }
+
+    //function which returns void
     if (strcmp((*token)->vec->data, "void") == 0) {
         Token* label = (*token)->next;
         while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ";") == 0)) {
             if (label && (label->type == NAME || (label->type == KWORD &&  strcmp(label->vec->data, "main") == 0))
                 && label->next && (label->next->type == DELIMITER)) {
                 if (strcmp(label->next->vec->data, "(") == 0) {
+                    //add function to function list
                     Function* newFunction = initFunction(label->vec->data, RETURN_INT);
                     currentFunction = newFunction;
 
@@ -403,6 +458,8 @@ Node* addKwordToken(Node* root, Token** token) {
                     newNode->function = newFunction;
                     
                     label = label->next;
+
+                    //add parametrs
                     while (label && !(label->type == DELIMITER && strcmp(label->vec->data, ")") == 0)) {
                         if (label->type == NAME) {
                             Variable* newVariable = initVariable(label->vec->data, 4, VAR, 1, 1);
@@ -428,7 +485,9 @@ Node* addKwordToken(Node* root, Token** token) {
         
     }
 
+    //if token
     else if (strcmp((*token)->vec->data, "if") == 0) {
+        //add Node
         Node* newNode = createNode();
         if (newNode == NULL) {
             return NULL;
@@ -437,6 +496,8 @@ Node* addKwordToken(Node* root, Token** token) {
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+
+        //checking correct c code and make a () token
         if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
             || strcmp((*token)->vec->data, "(") != 0) {
             printErrorMessage(15);
@@ -446,7 +507,10 @@ Node* addKwordToken(Node* root, Token** token) {
         pushBackVector((*token)->vec, '\0');
         return newNode;
     }
+
+    //else token
     else if (strcmp((*token)->vec->data, "else") == 0) {
+        //add Node
         Node* newNode = createNode();
         if (newNode == NULL) {
             return NULL;
@@ -455,6 +519,8 @@ Node* addKwordToken(Node* root, Token** token) {
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+
+        //checking correct c code and make a () token
         if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
             || strcmp((*token)->vec->data, "(") != 0) {
             printErrorMessage(15);
@@ -465,6 +531,7 @@ Node* addKwordToken(Node* root, Token** token) {
         return newNode;
     }
     else if (strcmp((*token)->vec->data, "while") == 0) {
+        //add Node
         Node* newNode = createNode();
         if (newNode == NULL) {
             return NULL;
@@ -473,6 +540,8 @@ Node* addKwordToken(Node* root, Token** token) {
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+        
+        //checking correct c code and make a () token
         if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
             || strcmp((*token)->vec->data, "(") != 0) {
             printErrorMessage(15);
@@ -483,11 +552,14 @@ Node* addKwordToken(Node* root, Token** token) {
         return newNode;
     }
     else if (strcmp((*token)->vec->data, "for") == 0) {
+        //add Node
         Node* newNode = createNode();
         newNode->top = root;
         newNode->token = (*token);
         root->bottom = newNode;
         *token = (*token)->next;
+
+        //checking correct c code and make a () token
         if ((*token) == NULL || (*token)->type != DELIMITER || (*token)->vec == NULL
             || strcmp((*token)->vec->data, "(") != 0) {
             printErrorMessage(15);
@@ -498,6 +570,7 @@ Node* addKwordToken(Node* root, Token** token) {
         return newNode;
     }
     else if (strcmp((*token)->vec->data, "return") == 0) {
+        //add Node
         Node* newNode = createNode();
         if (newNode == NULL) {
             return NULL;
@@ -517,12 +590,16 @@ Node* addKwordToken(Node* root, Token** token) {
     return NULL;
 }
 
+//work with delimetrs
 Node* addDelimetrToken(Node* root, Token** token) {
     if (root == NULL || token == NULL||(*token) == NULL) {
         return NULL;
     }
+    //return to start of statement and make a new stage
     if (strcmp((*token)->vec->data, ";") == 0) {
             (*token) = (*token)->next;
+
+            //try to find start of statement
             while (root->parent != NULL) {
                 root = root->parent;
             }
@@ -539,6 +616,7 @@ Node* addDelimetrToken(Node* root, Token** token) {
             isLastOp = 1;
             return newNode;
         }
+    // block for , in function
     else if (strcmp((*token)->vec->data, ",") == 0) {
             (*token) = (*token)->next;
             while (root && root->parent != NULL) {
@@ -560,6 +638,8 @@ Node* addDelimetrToken(Node* root, Token** token) {
             }
             return newNode;
         }
+
+    //block (
     else if (strcmp((*token)->vec->data, "(") == 0) {
             isLastOp = 1;
             Node* newNode = createNode();
@@ -570,12 +650,14 @@ Node* addDelimetrToken(Node* root, Token** token) {
             newNode->token = *token;
             (*token) = (*token)->next;
 
+        //check if previous Node is DATA_NODE => make a new block
             if (root->type == DATA_NODE) {
                 root->next = newNode;
                 newNode->prev = root;
                 return newNode;
             }
 
+        //make a new block if it is a equation
             newNode->parent = root;
             if (root->right == NULL) {
                 root->right = newNode;
@@ -585,9 +667,12 @@ Node* addDelimetrToken(Node* root, Token** token) {
             }
             return newNode;
         }
+
+    //block )
     else if (strcmp((*token)->vec->data, ")") == 0) {
             isLastOp = 0;
             (*token) = (*token)->next;
+        //try to find ( in parent
             while ( (root && (root->parent != NULL || root->prev != NULL || root->top != NULL) && !(root->token &&
                 root->token->type == DELIMITER
                 && ((strcmp(root->token->vec->data, "(") == 0) || (strcmp(root->token->vec->data, "()") == 0)))) ) {
@@ -606,15 +691,21 @@ Node* addDelimetrToken(Node* root, Token** token) {
         }
         return root;
         }
+
+    //block for [
+    //try to find ] in parent Nodes
     else if (strcmp((*token)->vec->data, "]") == 0) {
             isLastOp = 0;
             (*token) = (*token)->next;
+        // finding ]
             while (root && root->parent != NULL && !(root->token->type == BIN_OPERATOR
                 && strcmp(root->token->vec->data, "[") == 0)) {
                 root = root->parent;
                 }
             return root;
         }
+
+    //special symbol for if, else, while
     else if (strcmp((*token)->vec->data, "()") == 0) {
         Node* newNode = createNode();
         if (newNode == NULL) {
@@ -631,13 +722,19 @@ Node* addDelimetrToken(Node* root, Token** token) {
     return NULL;
 }
 
+//add close scope
+//make a new scope
 Node* addScopeOpenToken(Node* root, Token** token) {
+    //add depth for check correction
     depth++;
+
+    //make a new Node
     Node* newNode = createNode();
     root->bottom = newNode;
     newNode->top = root;
     root = root->bottom;
 
+    //make a new scope
     newNode = createNode();
     root->next = newNode;
     newNode->prev = root;
@@ -653,7 +750,10 @@ Node* addScopeOpenToken(Node* root, Token** token) {
     return newNode;
 }
 
+//add close scope
+//while not find ( recursevly call it for root
 Node* addScopeCloseToken(Node* root, Token** token) {
+    //check if () correct
     depth--;
     if (depth < 0) {
         printErrorMessage(16);
@@ -662,6 +762,8 @@ Node* addScopeCloseToken(Node* root, Token** token) {
     if (depth == 0) {
         currentFunction = NULL;
     }
+
+    //make return Node
     Node* newRoot = createNode();
     if (newRoot == NULL) {
         return NULL;
@@ -670,7 +772,8 @@ Node* addScopeCloseToken(Node* root, Token** token) {
     *token = (*token)->next;
     root->bottom = newRoot;
     newRoot->top = root;
-    
+
+    //find (
     while (root && root->top != NULL) {
         root = root->top;
     }
@@ -678,8 +781,10 @@ Node* addScopeCloseToken(Node* root, Token** token) {
         root = root->prev;
     }
     else {
+        // if dont find (
         printErrorMessage(12);
     }
+    
     newRoot = createNode();
     newRoot->top = root;
     if (root == NULL) {
@@ -691,6 +796,7 @@ Node* addScopeCloseToken(Node* root, Token** token) {
     return newRoot;
 }
 
+//switch by token type
 Node* addTokenToNode(Node* root, Token** token) {
     switch ((*token)->type) {
         case (INCLUDE):
@@ -716,10 +822,13 @@ Node* addTokenToNode(Node* root, Token** token) {
     }
 };
 
+//main function to make AST
 Node* createAST(Token* token){
     if (token == NULL) {
         return NULL;
     }
+
+    //make root
     Node* root = createNode();
     if (root == NULL){
         return NULL;
@@ -727,12 +836,16 @@ Node* createAST(Token* token){
     root->type = DATA_NODE;
     Node* node = root;
     Token **tok = &token;
+
+    //analyse list of tokens
     while(token != NULL && node != NULL){
         node = addTokenToNode(node, tok);
     }
     if (root == NULL) {
         return NULL;
     }
+
+    //return root of tree
     while (root->parent != NULL || root->prev != NULL || root->top != NULL) {
         if (root->parent != NULL) {
             root = root->parent;
