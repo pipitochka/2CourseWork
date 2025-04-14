@@ -21,8 +21,10 @@ typedef struct Node{
     int generated;
 } Node;
 
+//function to allocate memory for Node
 Node* createNode();
 
+//function to deallocate memory allocated for Node tree
 void freeNode(Node* node);
 
 #endif //NODE_H

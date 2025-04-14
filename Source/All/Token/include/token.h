@@ -16,14 +16,19 @@ typedef struct Token{
     int order;
 } Token;
 
+//function to allocate memory for token
 Token* initToken();
 
+//helper function to print tokens
 void printTokens(const Token* token);
 
+//function to deallocate memory for list of tokens
 void deleteTokens(Token* token);
 
+//function to deallocate memory for concretion token
 void deleteToken(Token* token);
 
+//function to check if word in  keyword
 int checkKeyword(Token* token);
 
 #endif //TOKEN_H

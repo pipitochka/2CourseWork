@@ -2,6 +2,9 @@
 #include "../../../Safe/Error/include/error.h"
 #include <stdlib.h>
 
+//function to allocate memory for Node
+//return pointer to new Node or NULL if allocation can not be done
+//makes all fields equal to 0 or NULL
 Node* createNode(){
     Node* node = (Node *)malloc(sizeof(Node));
     if(node == NULL) {
@@ -22,6 +25,10 @@ Node* createNode(){
     return node;
 };
 
+//function to deallocate memory allocated for Node tree
+//recursively call itself for children of a Node
+//free memory for node
+//do not free memory for token
 void freeNode(Node* node) {
     if (node != NULL) {
         freeNode(node->left);
